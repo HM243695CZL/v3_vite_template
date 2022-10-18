@@ -34,7 +34,6 @@
 </template>
 
 <script lang='ts' setup>
-import { defineEmits } from 'vue';
 
 const emits = defineEmits([
 	'clickSearch', 'clickReset', 'clickBatchDelete'

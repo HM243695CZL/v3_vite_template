@@ -13,8 +13,14 @@
 				</template>
 			</CommonTop>
 			<vxe-table
-				ref='teacherTableRef'
+				ref='tableRef'
 				:data='dataList'
+				:row-config='{
+					useKey: true,
+					keyField: "id"
+				}'
+				@checkbox-all='selectionChange'
+				@checkbox-change='selectionChange'
 				@filter-change='filterChange'
 			>
 				<vxe-column type='checkbox' width='60' />
@@ -52,8 +58,8 @@
 				</vxe-column>
 			</vxe-table>
 			<el-pagination
-				@size-change="onHandleSizeChange"
-				@current-change="onHandleCurrentChange"
+				@size-change="changePageSize"
+				@current-change="changePageIndex"
 				class="mt15"
 				:pager-count="5"
 				:page-sizes="[10, 20, 30]"
@@ -70,29 +76,25 @@
 
 <script lang='ts'>
 import { reactive, ref, toRefs, getCurrentInstance, onMounted, nextTick } from 'vue';
-import crudMixin from '/@/mixin/crudMixin';
 import { teacherBaseApi, teacherPositionApi, teacherTitleApi, teacherWorkTypeApi } from '/@/api/plat/teacher';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
+import useCrud from '/@/hooks/useCrud';
 
 export default {
 	name: 'teacher',
-	mixins: [crudMixin],
 	components: {
 		CommonTop
 	},
 	setup() {
-		const { proxy } = getCurrentInstance();
 		const addUserRef = ref();
 		const updatePassRef = ref();
-		const teacherTableRef = ref();
 		const state = reactive({
 			uris: {
 				page: `${teacherBaseApi}page`,
 				deleteBatch: `${teacherBaseApi}delete`
 			},
-			tableName: 'teacherTableRef',
 			typeObj: {
 				0: '专技',
 				1: '工勤',
@@ -104,24 +106,26 @@ export default {
 				1: '女'
 			}
 		});
-		const filterChange = ({ filters }: any) => {
-			if (filters.length === 0) {
-				proxy.searchParams = {};
-			} else {
-				filters.map(item => {
-					if (item.datas[0] === undefined) {
-						proxy.searchParams[item.field] = item.values;
-					} else {
-						proxy.searchParams[item.field] = item.datas[0];
-					}
-				});
-			}
-			proxy.clickSearch();
-		};
+		const {
+			getDataList,
+			changePageIndex,
+			changePageSize,
+			filterChange,
+			selectionChange,
+			clickSearch,
+			clickReset,
+			clickBatchDelete,
+			pageInfo,
+			dataList,
+			tableRef,
+			searchParams
+		} = useCrud({
+			uris: state.uris
+		});
 		const getPositionList = () => {
 			postAction(teacherPositionApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
-					const positionColumn = teacherTableRef.value.getColumnByField('position');
+					const positionColumn = tableRef.value.getColumnByField('position');
 					const positionList = [] as any;
 					res.datas.map((item: any) => {
 						positionList.push({
@@ -129,14 +133,14 @@ export default {
 							value: item.value
 						})
 					});
-					teacherTableRef.value.setFilter(positionColumn, positionList);
+					tableRef.value.setFilter(positionColumn, positionList);
 				}
 			})
 		};
 		const getTitleList = () => {
 			postAction(teacherTitleApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
-					const titleColumn = teacherTableRef.value.getColumnByField('title');
+					const titleColumn = tableRef.value.getColumnByField('title');
 					const titleList = [] as any;
 					res.datas.map((item: any) => {
 						titleList.push({
@@ -144,13 +148,13 @@ export default {
 							value: item.value
 						})
 					});
-					teacherTableRef.value.setFilter(titleColumn, titleList);
+					tableRef.value.setFilter(titleColumn, titleList);
 				}
 			})
 		};
 		const getTypeList = () => {
 			nextTick(() => {
-				const typeColumn = teacherTableRef.value.getColumnByField('type');
+				const typeColumn = tableRef.value.getColumnByField('type');
 				const typeList = [] as any;
 				for (const o in state.typeObj) {
 					typeList.push({
@@ -158,13 +162,13 @@ export default {
 						value: o
 					})
 				}
-				teacherTableRef.value.setFilter(typeColumn, typeList);
+				tableRef.value.setFilter(typeColumn, typeList);
 			})
 		};
 		const getWorkTypeList = () => {
 			postAction(teacherWorkTypeApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
-					const workTypeColumn = teacherTableRef.value.getColumnByField('workType');
+					const workTypeColumn = tableRef.value.getColumnByField('workType');
 					const workTypeList = [] as any;
 					res.datas.map((item: any) => {
 						workTypeList.push({
@@ -172,13 +176,13 @@ export default {
 							value: item.value
 						})
 					});
-					teacherTableRef.value.setFilter(workTypeColumn, workTypeList);
+					tableRef.value.setFilter(workTypeColumn, workTypeList);
 				}
 			})
 		};
 		const getSexList = () => {
 			nextTick(() => {
-				const sexColumn = teacherTableRef.value.getColumnByField('sex');
+				const sexColumn = tableRef.value.getColumnByField('sex');
 				const sexList = [] as any;
 				for (const o in state.sexObj) {
 					sexList.push({
@@ -186,7 +190,7 @@ export default {
 						value: o
 					})
 				}
-				teacherTableRef.value.setFilter(sexColumn, sexList);
+				tableRef.value.setFilter(sexColumn, sexList);
 			})
 		};
 		onMounted(() => {
@@ -199,9 +203,20 @@ export default {
 		return {
 			addUserRef,
 			updatePassRef,
+			tableRef,
 			filterChange,
-			teacherTableRef,
 			...toRefs(state),
+
+			getDataList,
+			changePageIndex,
+			changePageSize,
+			clickSearch,
+			clickReset,
+			clickBatchDelete,
+			selectionChange,
+			pageInfo,
+			dataList,
+			searchParams
 		};
 	}
 };

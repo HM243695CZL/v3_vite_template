@@ -23,7 +23,9 @@
 		"vue": "^3.2.31",
 		"vue-clipboard3": "^1.0.1",
 		"vue-router": "^4.0.13",
-		"vuex": "^4.0.2"
+		"vuex": "^4.0.2",
+		"vxe-table": "^4.3.5",
+		"xe-utils": "^3.5.7"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.0",
@@ -69,5 +71,10 @@
 	"repository": {
 		"type": "git",
 		"url": "https://gitee.com/lyt-top/vue-next-admin.git"
+	},
+	"eslintConfig": {
+		"rules": {
+			"no-mixed-spaces-and-tabs": 0
+		}
 	}
 }
