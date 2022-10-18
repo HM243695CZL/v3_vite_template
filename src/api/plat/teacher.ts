@@ -1,3 +1,5 @@
 import { SERVER_NAME} from '/@/utils/config';
-export const teacherApi = `${SERVER_NAME.SECURITY_SERVER}sys/teacher/`
-
+export const teacherBaseApi = `${SERVER_NAME.SECURITY_SERVER}sys/teacher/`;
+export const teacherPositionApi = `${SERVER_NAME.SECURITY_SERVER}sys/dictionary/listFilter/teacher-position`;
+export const teacherTitleApi = `${SERVER_NAME.SECURITY_SERVER}sys/dictionary/listFilter/teacher-title`;
+export const teacherWorkTypeApi = `${SERVER_NAME.SECURITY_SERVER}sys/dictionary/listFilter/teacher-workType`;

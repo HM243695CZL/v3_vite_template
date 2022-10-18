@@ -1,47 +1,56 @@
 <template>
 	<div class='teacher-container h100'>
 		<el-card shadow="hover">
-			<div class="system-user-search mb15">
-				<el-input v-model='searchParams.username' size="default" placeholder="请输入用户名称" style="max-width: 180px" clearable> </el-input>
-				<el-button size="default" type="primary" class="ml10" @click='clickSearch'>
-					<el-icon>
-						<ele-Search />
-					</el-icon>
-					查询
-				</el-button>
-				<el-button size="default" type="success" class="ml10" @click="onOpenAddUser">
-					新增用户
-				</el-button>
-			</div>
-			<el-table border stripe :data="dataList" style="width: 100%">
-				<el-table-column type="selection" width="55" />
-				<el-table-column label='姓名' prop='name' show-overflow-tooltip />
-				<el-table-column label='工号' prop='number' show-overflow-tooltip />
-				<el-table-column label='部门' prop='orgName' show-overflow-tooltip />
-				<el-table-column label='职务' prop='position' show-overflow-tooltip />
-				<el-table-column label='职称' prop='title' show-overflow-tooltip />
-				<el-table-column label='岗位类型' prop='type' show-overflow-tooltip >
+			<CommonTop @clickSearch='clickSearch' @clickReset='clickReset' @clickBatchDelete='clickBatchDelete'>
+				<template #left>左侧插槽</template>
+				<template #right>
+					<el-form-item label='姓名'>
+						<el-input placeholder='请输入姓名' v-model='searchParams.name'></el-input>
+					</el-form-item>
+					<el-form-item label='工号'>
+						<el-input placeholder='请输入工号' v-model='searchParams.number'></el-input>
+					</el-form-item>
+				</template>
+			</CommonTop>
+			<vxe-table
+				ref='teacherTableRef'
+				:data='dataList'
+				@filter-change='filterChange'
+			>
+				<vxe-column type='checkbox' width='60' />
+				<vxe-column field='name' title='姓名'/>
+				<vxe-column field='number' title='工号' />
+				<vxe-column field='orgName' title='部门' :filters="[{ data: '' }]" >
+					<template #filter="{ $panel, column }">
+						<el-input class='input-filter' v-for="(option, index) in column.filters" :key="index"
+									 v-model="option.data" @input="$panel.changeOption($event, !!option.data, option)"
+									 @keyup.enter="$panel.confirmFilter()" placeholder="请输入部门" />
+					</template>
+				</vxe-column>
+				<vxe-column field='position' title='职务' :filters='[]' />
+				<vxe-column field='title' title='职称' :filters='[]' />
+				<vxe-column field='type' title='岗位类型' :filters='[]'>
 					<template #default='scope'>
 						{{typeObj[scope.row.type]}}
 					</template>
-				</el-table-column>
-				<el-table-column label='任职类型' prop='workType' show-overflow-tooltip />
-				<el-table-column label='性别' prop='sex' show-overflow-tooltip>
+				</vxe-column>
+				<vxe-column field='workType' title='任职类型' :filters='[]' />
+				<vxe-column field='sex' title='性别' :filters='[]'>
 					<template #default='scope'>
 						{{sexObj[scope.row.sex]}}
 					</template>
-				</el-table-column>
-				<el-table-column label='电话' prop='telphone' show-overflow-tooltip />
-				<el-table-column label='邮箱' prop='email' show-overflow-tooltip />
-				<el-table-column label="操作" width="310">
+				</vxe-column>
+				<vxe-column field='telphone' title='电话'/>
+				<vxe-column field='email' title='邮箱' />
+				<vxe-column title='操作' width='310'>
 					<template #default="scope">
-						<el-button size="small" type="primary">编辑</el-button>
-						<el-button size="small" type="primary">重置密码</el-button>
-						<el-button size="small" type="default">分配角色</el-button>
-						<el-button size="small" type="danger">删除</el-button>
+						<el-button size='small' type="primary">编辑</el-button>
+						<el-button size='small' type="primary">重置密码</el-button>
+						<el-button size='small' type="default">分配角色</el-button>
+						<el-button size='small' type="danger">删除</el-button>
 					</template>
-				</el-table-column>
-			</el-table>
+				</vxe-column>
+			</vxe-table>
 			<el-pagination
 				@size-change="onHandleSizeChange"
 				@current-change="onHandleCurrentChange"
@@ -60,21 +69,30 @@
 </template>
 
 <script lang='ts'>
-import { defineComponent, reactive, ref, toRefs, getCurrentInstance } from 'vue';
+import { reactive, ref, toRefs, getCurrentInstance, onMounted, nextTick } from 'vue';
 import crudMixin from '/@/mixin/crudMixin';
-import { teacherApi } from '/@/api/plat/teacher';
+import { teacherBaseApi, teacherPositionApi, teacherTitleApi, teacherWorkTypeApi } from '/@/api/plat/teacher';
+import CommonTop from '/@/components/CommonTop/index.vue';
+import { postAction } from '/@/api/common';
+import { StatusEnum } from '/@/enum/status.enum';
 
-export default defineComponent({
+export default {
 	name: 'teacher',
 	mixins: [crudMixin],
+	components: {
+		CommonTop
+	},
 	setup() {
 		const { proxy } = getCurrentInstance();
 		const addUserRef = ref();
 		const updatePassRef = ref();
+		const teacherTableRef = ref();
 		const state = reactive({
 			uris: {
-				page: `${teacherApi}page`
+				page: `${teacherBaseApi}page`,
+				deleteBatch: `${teacherBaseApi}delete`
 			},
+			tableName: 'teacherTableRef',
 			typeObj: {
 				0: '专技',
 				1: '工勤',
@@ -86,40 +104,107 @@ export default defineComponent({
 				1: '女'
 			}
 		});
-		// 初始化表格数据
-		const getUserPageList = () => {
+		const filterChange = ({ filters }: any) => {
+			if (filters.length === 0) {
+				proxy.searchParams = {};
+			} else {
+				filters.map(item => {
+					if (item.datas[0] === undefined) {
+						proxy.searchParams[item.field] = item.values;
+					} else {
+						proxy.searchParams[item.field] = item.datas[0];
+					}
+				});
+			}
+			proxy.clickSearch();
 		};
-		const clickSearch = () => {
-			state.pageIndex = 1;
-			getUserPageList();
-		}
-		// 打开新增角色弹窗
-		const onOpenAddUser = () => {
-			addUserRef.value.openDialog();
+		const getPositionList = () => {
+			postAction(teacherPositionApi, {}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					const positionColumn = teacherTableRef.value.getColumnByField('position');
+					const positionList = [] as any;
+					res.datas.map((item: any) => {
+						positionList.push({
+							label: item.text,
+							value: item.value
+						})
+					});
+					teacherTableRef.value.setFilter(positionColumn, positionList);
+				}
+			})
 		};
-		// 打开修改角色弹窗
-		const handleEdit = (row: any) => {
-			addUserRef.value.openDialog(row);
+		const getTitleList = () => {
+			postAction(teacherTitleApi, {}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					const titleColumn = teacherTableRef.value.getColumnByField('title');
+					const titleList = [] as any;
+					res.datas.map((item: any) => {
+						titleList.push({
+							label: item.text,
+							value: item.value
+						})
+					});
+					teacherTableRef.value.setFilter(titleColumn, titleList);
+				}
+			})
 		};
-		const handleDelete = (row: any) => {
-
+		const getTypeList = () => {
+			nextTick(() => {
+				const typeColumn = teacherTableRef.value.getColumnByField('type');
+				const typeList = [] as any;
+				for (const o in state.typeObj) {
+					typeList.push({
+						label: state.typeObj[o],
+						value: o
+					})
+				}
+				teacherTableRef.value.setFilter(typeColumn, typeList);
+			})
 		};
-		const handleEditPass = (row: any) => {
-			updatePassRef.value.openDialog(row);
+		const getWorkTypeList = () => {
+			postAction(teacherWorkTypeApi, {}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					const workTypeColumn = teacherTableRef.value.getColumnByField('workType');
+					const workTypeList = [] as any;
+					res.datas.map((item: any) => {
+						workTypeList.push({
+							label: item.text,
+							value: item.value
+						})
+					});
+					teacherTableRef.value.setFilter(workTypeColumn, workTypeList);
+				}
+			})
 		};
+		const getSexList = () => {
+			nextTick(() => {
+				const sexColumn = teacherTableRef.value.getColumnByField('sex');
+				const sexList = [] as any;
+				for (const o in state.sexObj) {
+					sexList.push({
+						label: state.sexObj[o],
+						value: o
+					})
+				}
+				teacherTableRef.value.setFilter(sexColumn, sexList);
+			})
+		};
+		onMounted(() => {
+			getPositionList();
+			getTitleList();
+			getTypeList();
+			getWorkTypeList();
+			getSexList();
+		});
 		return {
 			addUserRef,
 			updatePassRef,
-			handleEdit,
-			handleDelete,
-			handleEditPass,
-			getUserPageList,
-			onOpenAddUser,
-			clickSearch,
+			filterChange,
+			teacherTableRef,
 			...toRefs(state),
 		};
 	}
-});
+};
 </script>
 
 <style scoped lang='scss'>
