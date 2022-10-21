@@ -45,6 +45,7 @@ module.exports = {
 		'vue/no-parsing-error': 'off',
 		'vue/no-deprecated-v-on-native-modifier': 'off',
 		'vue/multi-word-component-names': 'off',
+		'vue/setup-compiler-macros': true,
 		'no-useless-escape': 'off',
 		'no-sparse-arrays': 'off',
 		'no-prototype-builtins': 'off',
@@ -59,5 +60,6 @@ module.exports = {
 		'no-v-model-argument': 'off',
 		'no-case-declarations': 'off',
 		'no-console': 'error',
+		'no-mixed-spaces-and-tabs': 0
 	},
 };

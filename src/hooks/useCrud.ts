@@ -5,10 +5,12 @@ import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
+import _ from 'lodash';
 
 export default function(params: any) {
 	const { uris } = params;
 	const tableRef = ref();
+	const modalFormRef = ref();
 	const state = reactive({
 		pageInfo: new PageEntity(),
 		dataList: [],
@@ -30,6 +32,18 @@ export default function(params: any) {
 				state.pageInfo.totalRecords = res.datas.totalRecords;
 			}
 		})
+	};
+	/**
+	 * 点击新增
+	 */
+	const clickAdd = () => {
+		modalFormRef.value.openDialog();
+	};
+	/**
+	 * 点击编辑
+	 */
+	const clickEdit = (row: any) => {
+		modalFormRef.value.openDialog(_.cloneDeep(row));
 	};
 	/**
 	 * 点击查询
@@ -141,6 +155,8 @@ export default function(params: any) {
 		getDataList();
 	});
 	return {
+		clickAdd,
+		clickEdit,
 		getDataList,
 		clickSearch,
 		clickReset,
@@ -150,6 +166,7 @@ export default function(params: any) {
 		changePageIndex,
 		changePageSize,
 		tableRef,
+		modalFormRef,
 		...toRefs(state)
 	}
 }

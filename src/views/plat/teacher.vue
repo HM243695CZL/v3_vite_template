@@ -1,7 +1,11 @@
 <template>
 	<div class='teacher-container h100'>
 		<el-card shadow="hover">
-			<CommonTop @clickSearch='clickSearch' @clickReset='clickReset' @clickBatchDelete='clickBatchDelete'>
+			<CommonTop
+				@clickAdd='clickAdd'
+				@clickSearch='clickSearch'
+				@clickReset='clickReset'
+				@clickBatchDelete='clickBatchDelete'>
 				<template #left>左侧插槽</template>
 				<template #right>
 					<el-form-item label='姓名'>
@@ -50,7 +54,7 @@
 				<vxe-column field='email' title='邮箱' />
 				<vxe-column title='操作' width='310'>
 					<template #default="scope">
-						<el-button size='small' type="primary">编辑</el-button>
+						<el-button size='small' type="primary" @click='clickEdit(scope.row)'>编辑</el-button>
 						<el-button size='small' type="primary">重置密码</el-button>
 						<el-button size='small' type="default">分配角色</el-button>
 						<el-button size='small' type="danger">删除</el-button>
@@ -71,21 +75,33 @@
 			>
 			</el-pagination>
 		</el-card>
+		<TeacherModal ref='modalFormRef'
+									@refreshList='clickReset'
+									:dept-list='deptList'
+									:position-list='positionList'
+									:title-list='titleList'
+									:type-list='typeObj'
+									:work-type-list='workTypeList'
+									:sex-list='sexObj'
+		/>
 	</div>
 </template>
 
 <script lang='ts'>
-import { reactive, ref, toRefs, getCurrentInstance, onMounted, nextTick } from 'vue';
+import { reactive, ref, toRefs, onMounted, nextTick } from 'vue';
 import { teacherBaseApi, teacherPositionApi, teacherTitleApi, teacherWorkTypeApi } from '/@/api/plat/teacher';
 import CommonTop from '/@/components/CommonTop/index.vue';
-import { postAction } from '/@/api/common';
+import { postAction, getAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import useCrud from '/@/hooks/useCrud';
+import TeacherModal from './component/teacherModal.vue'
+import { deptListApi } from '/@/api/plat/dept';
 
 export default {
 	name: 'teacher',
 	components: {
-		CommonTop
+		CommonTop,
+		TeacherModal
 	},
 	setup() {
 		const addUserRef = ref();
@@ -103,10 +119,16 @@ export default {
 			},
 			sexObj: {
 				0: '男',
-				1: '女'
-			}
+				1: '女',
+			},
+			deptList: [],
+			positionList : [] as any,
+			titleList: [] as any,
+			workTypeList: [] as any
 		});
 		const {
+			clickAdd,
+			clickEdit,
 			getDataList,
 			changePageIndex,
 			changePageSize,
@@ -118,6 +140,7 @@ export default {
 			pageInfo,
 			dataList,
 			tableRef,
+			modalFormRef,
 			searchParams
 		} = useCrud({
 			uris: state.uris
@@ -126,14 +149,14 @@ export default {
 			postAction(teacherPositionApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
 					const positionColumn = tableRef.value.getColumnByField('position');
-					const positionList = [] as any;
 					res.datas.map((item: any) => {
-						positionList.push({
+						state.positionList.push({
+							id: item.id,
 							label: item.text,
 							value: item.value
 						})
 					});
-					tableRef.value.setFilter(positionColumn, positionList);
+					tableRef.value.setFilter(positionColumn, state.positionList);
 				}
 			})
 		};
@@ -141,14 +164,14 @@ export default {
 			postAction(teacherTitleApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
 					const titleColumn = tableRef.value.getColumnByField('title');
-					const titleList = [] as any;
 					res.datas.map((item: any) => {
-						titleList.push({
+						state.titleList.push({
+							id: item.id,
 							label: item.text,
 							value: item.value
 						})
 					});
-					tableRef.value.setFilter(titleColumn, titleList);
+					tableRef.value.setFilter(titleColumn, state.titleList);
 				}
 			})
 		};
@@ -169,14 +192,14 @@ export default {
 			postAction(teacherWorkTypeApi, {}).then(res => {
 				if (res.status === StatusEnum.SUCCESS) {
 					const workTypeColumn = tableRef.value.getColumnByField('workType');
-					const workTypeList = [] as any;
 					res.datas.map((item: any) => {
-						workTypeList.push({
+						state.workTypeList.push({
+							id: item.id,
 							label: item.text,
 							value: item.value
 						})
 					});
-					tableRef.value.setFilter(workTypeColumn, workTypeList);
+					tableRef.value.setFilter(workTypeColumn, state.workTypeList);
 				}
 			})
 		};
@@ -193,30 +216,41 @@ export default {
 				tableRef.value.setFilter(sexColumn, sexList);
 			})
 		};
+		const getDeptList = () => {
+			getAction(deptListApi, '').then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.deptList = res.datas;
+				}
+			})
+		};
 		onMounted(() => {
 			getPositionList();
 			getTitleList();
 			getTypeList();
 			getWorkTypeList();
 			getSexList();
+			getDeptList();
 		});
 		return {
 			addUserRef,
 			updatePassRef,
-			tableRef,
-			filterChange,
 			...toRefs(state),
 
+			clickAdd,
+			clickEdit,
 			getDataList,
 			changePageIndex,
 			changePageSize,
+			filterChange,
 			clickSearch,
 			clickReset,
 			clickBatchDelete,
 			selectionChange,
 			pageInfo,
 			dataList,
-			searchParams
+			searchParams,
+			tableRef,
+			modalFormRef,
 		};
 	}
 };

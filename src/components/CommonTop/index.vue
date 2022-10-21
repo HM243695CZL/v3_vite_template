@@ -2,7 +2,7 @@
 	<div class='common-top-container mb15'>
 		<div class='search-top-title'>
 			<div class='search-top-title-left'>
-				<el-button size="default" type="primary">
+				<el-button size="default" type="primary" @click='clickAdd'>
 					<el-icon>
 						<ele-Plus />
 					</el-icon>
@@ -36,18 +36,21 @@
 <script lang='ts' setup>
 
 const emits = defineEmits([
-	'clickSearch', 'clickReset', 'clickBatchDelete'
+	'clickSearch', 'clickReset', 'clickBatchDelete', 'clickAdd'
 ]);
 
 const clickSearch = () => {
 	emits('clickSearch');
-}
+};
 const clickReset = () => {
 	emits('clickReset')
-}
+};
 const clickBatchDelete = () => {
 	emits('clickBatchDelete')
-}
+};
+const clickAdd = () => {
+	emits('clickAdd')
+};
 </script>
 
 <style scoped lang='scss'>
