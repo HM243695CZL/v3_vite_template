@@ -5,3 +5,4 @@ export const teacherTitleApi = `${SERVER_NAME.SECURITY_SERVER}sys/dictionary/lis
 export const teacherWorkTypeApi = `${SERVER_NAME.SECURITY_SERVER}sys/dictionary/listFilter/teacher-workType`;
 export const createTeacherApi = `${teacherBaseApi}create`;
 export const updateTeacherApi = `${teacherBaseApi}update`;
+export const resetPasswordApi = `${SERVER_NAME.SECURITY_SERVER}sys/user/resetPassword`;

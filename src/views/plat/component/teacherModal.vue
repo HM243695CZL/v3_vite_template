@@ -75,7 +75,7 @@
 			<template #footer>
 				<div class='dialog-footer'>
 					<el-button @click='closeDialog'>取 消</el-button>
-					<el-button type='primary' @click='clickConfirm' :loading='state.loading'>确 定</el-button>
+					<el-button type='primary' @click='clickConfirm'>确 定</el-button>
 				</div>
 			</template>
 		</el-dialog>
@@ -124,7 +124,6 @@ const emits = defineEmits([
 ]);
 const formRef = ref();
 const state = reactive({
-	loading: false,
 	isShowDialog: false,
 	title: '',
 	uploadUrl: `${baseUrl}${SERVER_NAME.UPLOAD_URL}`,
@@ -172,7 +171,6 @@ const state = reactive({
 	}
 });
 const closeDialog = () => {
-	state.loading = false;
 	state.isShowDialog = false;
 };
 const openDialog = (row: any) => {
@@ -198,16 +196,12 @@ const openDialog = (row: any) => {
 const clickConfirm = () => {
 	formRef.value.validate((valid: boolean) => {
 		if (valid) {
-			state.loading = true;
 			postAction(state.ruleForm.id ? updateTeacherApi : createTeacherApi, state.ruleForm).then(res => {
-				state.loading = false;
 				if (res.status === StatusEnum.SUCCESS) {
 					ElMessage.success(res.message);
 					closeDialog();
 					emits('refreshList');
 				}
-			}).finally(_ => {
-				state.loading = false;
 			})
 		}
 	})

@@ -58,11 +58,10 @@ const clickAdd = () => {
 	.search-top-title{
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
 		&-left{
 			display: flex;
 			justify-content: flex-start;
-			align-items: center;
 		}
 		&-right{
 			display: flex;

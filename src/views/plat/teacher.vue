@@ -55,7 +55,7 @@
 				<vxe-column title='操作' width='310'>
 					<template #default="scope">
 						<el-button size='small' type="primary" @click='clickEdit(scope.row)'>编辑</el-button>
-						<el-button size='small' type="primary">重置密码</el-button>
+						<el-button size='small' type="primary" @click='clickResetPassword(scope.row.id)'>重置密码</el-button>
 						<el-button size='small' type="default">分配角色</el-button>
 						<el-button size='small' type="danger">删除</el-button>
 					</template>
@@ -89,13 +89,20 @@
 
 <script lang='ts'>
 import { reactive, ref, toRefs, onMounted, nextTick } from 'vue';
-import { teacherBaseApi, teacherPositionApi, teacherTitleApi, teacherWorkTypeApi } from '/@/api/plat/teacher';
+import {
+	resetPasswordApi,
+	teacherBaseApi,
+	teacherPositionApi,
+	teacherTitleApi,
+	teacherWorkTypeApi,
+} from '/@/api/plat/teacher';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import { postAction, getAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import useCrud from '/@/hooks/useCrud';
 import TeacherModal from './component/teacherModal.vue'
 import { deptListApi } from '/@/api/plat/dept';
+import { ElMessage } from 'element-plus';
 
 export default {
 	name: 'teacher',
@@ -223,6 +230,15 @@ export default {
 				}
 			})
 		};
+		const clickResetPassword = (id: string) => {
+			postAction(resetPasswordApi, {
+				id
+			}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					ElMessage.success(res.message);
+				}
+			})
+		};
 		onMounted(() => {
 			getPositionList();
 			getTitleList();
@@ -234,6 +250,7 @@ export default {
 		return {
 			addUserRef,
 			updatePassRef,
+			clickResetPassword,
 			...toRefs(state),
 
 			clickAdd,
