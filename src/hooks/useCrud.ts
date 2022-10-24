@@ -77,7 +77,6 @@ export default function(params: any) {
 	 */
 	const clickReset = () => {
 		const resetParams = _.cloneDeep(state.searchParams);
-		console.log(resetParams);
 		state.pageInfo = new PageEntity();
 		state.searchParams = {};
 		initField.map((item: string) => {
