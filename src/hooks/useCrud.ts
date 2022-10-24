@@ -1,14 +1,14 @@
 import { onMounted, reactive, toRefs, computed, ref } from 'vue';
 import { PageEntity } from '/@/domain/page.entity';
 import { ElMessage } from 'element-plus';
-import { postAction } from '/@/api/common';
+import { getAction, postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
 import _ from 'lodash';
 
 export default function(params: any) {
-	const { uris } = params;
+	const { uris, parentRef } = params;
 	const tableRef = ref();
 	const modalFormRef = ref();
 	const state = reactive({
@@ -17,6 +17,7 @@ export default function(params: any) {
 		searchParams: {} as any,
 		selectedRowKeys: [] as any, // 被选中的数据主键
 		selectionRows: [], // 被选中的数据行
+		tableHeight: 300
 	});
 	/**
 	 * 加载表格数据
@@ -28,6 +29,9 @@ export default function(params: any) {
 		}
 		postAction(uris.page, state.pageInfo).then(res => {
 			if (res.status === StatusEnum.SUCCESS) {
+				if (parentRef) {
+					state.tableHeight = parentRef.value.getBoundingClientRect().height;
+				}
 				state.dataList = res.datas.data;
 				state.pageInfo.totalRecords = res.datas.totalRecords;
 			}
@@ -129,6 +133,21 @@ export default function(params: any) {
 		})
 	};
 	/**
+	 * 单个删除
+	 */
+	const clickDelete = (id: string) => {
+		if (!uris.delete) {
+			ElMessage.error('请设置uris.delete属性!')
+			return false;
+		}
+		postAction(uris.delete, {id}).then(res => {
+			if (res.status === StatusEnum.SUCCESS) {
+				ElMessage.success(res.message);
+				getDataList();
+			}
+		})
+	};
+	/**
 	 * 切换第几页
 	 * @param index 第几页
 	 */
@@ -162,6 +181,7 @@ export default function(params: any) {
 		clickReset,
 		filterChange,
 		selectionChange,
+		clickDelete,
 		clickBatchDelete,
 		changePageIndex,
 		changePageSize,

@@ -17,7 +17,7 @@
 		<vxe-table
 			ref='tableRef'
 			:data='dataList'
-			max-height='77%'
+			:max-height='tableHeight - otherHeight'
 			:row-config='{
 					useKey: true,
 					keyField: "id"
@@ -56,7 +56,7 @@
 					<el-button size='small' type="primary" @click='clickEdit(scope.row)'>编辑</el-button>
 					<el-button size='small' type="primary" @click='clickResetPassword(scope.row.id)'>重置密码</el-button>
 					<el-button size='small' type="default" @click='clickShowAuth(scope.row.id)'>分配角色</el-button>
-					<el-button size='small' type="danger">删除</el-button>
+					<el-button size='small' type="danger" @click='clickDelete(scope.row.id)'>删除</el-button>
 				</template>
 			</vxe-column>
 		</vxe-table>
@@ -90,7 +90,6 @@
 import { reactive, ref, toRefs, onMounted, nextTick } from 'vue';
 import {
 	resetPasswordApi,
-	teacherBaseApi,
 	getTeacherPageApi,
 	deleteTeacherApi
 } from '/@/api/plat/teacher';
@@ -135,6 +134,7 @@ export default {
 				0: '男',
 				1: '女',
 			},
+			otherHeight: 156, // 20 + 20 + 36 + 15 + 50 + 15
 			deptList: [],
 			positionList : [] as any,
 			titleList: [] as any,
@@ -155,9 +155,11 @@ export default {
 			dataList,
 			tableRef,
 			modalFormRef,
-			searchParams
+			searchParams,
+			tableHeight
 		} = useCrud({
-			uris: state.uris
+			uris: state.uris,
+			parentRef: teacherRef
 		});
 		const getPositionList = () => {
 			postAction(teacherPositionApi, {}).then(res => {
@@ -249,6 +251,14 @@ export default {
 		const clickShowAuth = (id: string) => {
 			divideRoleModalRef.value.openDialog(id);
 		};
+		const clickDelete = (id: string) => {
+			postAction(state.uris.deleteBatch, [id]).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					ElMessage.success(res.message);
+					clickSearch();
+				}
+			})
+		};
 		onMounted(() => {
 			getPositionList();
 			getTitleList();
@@ -256,9 +266,6 @@ export default {
 			getWorkTypeList();
 			getSexList();
 			getDeptList();
-			nextTick(() => {
-				// console.log(teacherRef.value.getBoundingClientRect());
-			})
 		});
 		return {
 			addUserRef,
@@ -267,6 +274,7 @@ export default {
 			teacherRef,
 			clickResetPassword,
 			clickShowAuth,
+			clickDelete,
 			...toRefs(state),
 
 			clickAdd,
@@ -284,6 +292,7 @@ export default {
 			searchParams,
 			tableRef,
 			modalFormRef,
+			tableHeight
 		};
 	}
 };
