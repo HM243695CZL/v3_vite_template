@@ -11,7 +11,13 @@
 					@clickSearch='clickSearch'
 					@clickReset='clickReset'
 					@clickBatchDelete='clickBatchDelete'
-				/>
+				>
+					<template #right>
+						<el-form-item label='班级名称'>
+							<el-input placeholder='请输入班级名称' v-model='searchParams.name'></el-input>
+						</el-form-item>
+					</template>
+				</CommonTop>
 				<vxe-table
 					ref='tableRef'
 					:data='dataList'
@@ -99,10 +105,13 @@ export default defineComponent({
 			tableHeight
 		} = useCrud({
 			uris: state.uris,
-			parentRef: classRef
+			parentRef: classRef,
+			isMountedLoad: false,
+			initField: ['majorId']
 		});
 		const clickNode = node => {
-			console.log(node);
+			searchParams.value.majorId = node.key;
+			clickSearch();
 		};
 		return {
 			clickNode,

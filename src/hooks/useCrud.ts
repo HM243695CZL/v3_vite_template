@@ -1,14 +1,14 @@
 import { onMounted, reactive, toRefs, computed, ref } from 'vue';
 import { PageEntity } from '/@/domain/page.entity';
 import { ElMessage } from 'element-plus';
-import { getAction, postAction } from '/@/api/common';
+import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
 import _ from 'lodash';
 
 export default function(params: any) {
-	const { uris, parentRef } = params;
+	const { uris, parentRef, isMountedLoad = true, initField } = params;
 	const tableRef = ref();
 	const modalFormRef = ref();
 	const state = reactive({
@@ -76,8 +76,15 @@ export default function(params: any) {
 	 * 点击重置
 	 */
 	const clickReset = () => {
+		const resetParams = _.cloneDeep(state.searchParams);
+		console.log(resetParams);
 		state.pageInfo = new PageEntity();
 		state.searchParams = {};
+		initField.map((item: string) => {
+			if (resetParams.hasOwnProperty(item)) {
+				state.pageInfo.filters[item] = PaginationUtils.filters(resetParams[item], FilterEnum.CONTAINS);
+			}
+		});
 		getDataList();
 	};
 	/**
@@ -171,7 +178,9 @@ export default function(params: any) {
 		return tableRef.value.rowConfig.keyField || '';
 	});
 	onMounted(() => {
-		getDataList();
+		if (isMountedLoad) {
+			getDataList();
+		}
 	});
 	return {
 		clickAdd,
