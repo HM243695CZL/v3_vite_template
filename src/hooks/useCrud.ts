@@ -82,6 +82,7 @@ export default function(params: any) {
 		initField.map((item: string) => {
 			if (resetParams.hasOwnProperty(item)) {
 				state.pageInfo.filters[item] = PaginationUtils.filters(resetParams[item], FilterEnum.CONTAINS);
+				state.searchParams[item] = resetParams[item];
 			}
 		});
 		getDataList();
