@@ -56,7 +56,7 @@
 					<template #default="scope">
 						<el-button size='small' type="primary" @click='clickEdit(scope.row)'>编辑</el-button>
 						<el-button size='small' type="primary" @click='clickResetPassword(scope.row.id)'>重置密码</el-button>
-						<el-button size='small' type="default">分配角色</el-button>
+						<el-button size='small' type="default" @click='clickShowAuth(scope.row.id)'>分配角色</el-button>
 						<el-button size='small' type="danger">删除</el-button>
 					</template>
 				</vxe-column>
@@ -84,6 +84,7 @@
 									:work-type-list='workTypeList'
 									:sex-list='sexObj'
 		/>
+		<DivideRoleModal ref='divideRoleModalRef' />
 	</div>
 </template>
 
@@ -92,15 +93,20 @@ import { reactive, ref, toRefs, onMounted, nextTick } from 'vue';
 import {
 	resetPasswordApi,
 	teacherBaseApi,
-	teacherPositionApi,
-	teacherTitleApi,
-	teacherWorkTypeApi,
+	getTeacherPageApi,
+	deleteTeacherApi
 } from '/@/api/plat/teacher';
+import {
+	teacherPositionApi,
+	teacherWorkTypeApi,
+	teacherTitleApi
+} from '/@/api/plat/dictionary';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import { postAction, getAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import useCrud from '/@/hooks/useCrud';
 import TeacherModal from './component/teacherModal.vue'
+import DivideRoleModal from './component/divideRoleModal.vue';
 import { deptListApi } from '/@/api/plat/dept';
 import { ElMessage } from 'element-plus';
 
@@ -108,15 +114,17 @@ export default {
 	name: 'teacher',
 	components: {
 		CommonTop,
-		TeacherModal
+		TeacherModal,
+		DivideRoleModal
 	},
 	setup() {
 		const addUserRef = ref();
 		const updatePassRef = ref();
+		const divideRoleModalRef = ref();
 		const state = reactive({
 			uris: {
-				page: `${teacherBaseApi}page`,
-				deleteBatch: `${teacherBaseApi}delete`
+				page: getTeacherPageApi,
+				deleteBatch: deleteTeacherApi
 			},
 			typeObj: {
 				0: '专技',
@@ -239,6 +247,9 @@ export default {
 				}
 			})
 		};
+		const clickShowAuth = (id: string) => {
+			divideRoleModalRef.value.openDialog(id);
+		};
 		onMounted(() => {
 			getPositionList();
 			getTitleList();
@@ -250,7 +261,9 @@ export default {
 		return {
 			addUserRef,
 			updatePassRef,
+			divideRoleModalRef,
 			clickResetPassword,
+			clickShowAuth,
 			...toRefs(state),
 
 			clickAdd,

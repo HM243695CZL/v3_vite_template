@@ -1,6 +1,9 @@
 <template>
 	<div class='teacher-modal-container'>
-		<el-dialog :append-to-body='false' :close-on-click-modal='false' :title='state.title' v-model='state.isShowDialog' width='800px'>
+		<el-dialog :append-to-body='false'
+							 :close-on-click-modal='false'
+							 :title='state.title'
+							 v-model='state.isShowDialog' width='800px'>
 			<el-form ref='formRef' :rules='state.rules' :model='state.ruleForm' label-width='100px'>
 				<el-row :gutter='20'>
 					<el-col :span='12'>
@@ -215,7 +218,7 @@ const handleSuccess = (res: any) => {
 };
 defineExpose({
 	openDialog
-})
+});
 </script>
 
 <style scoped lang='scss'>
