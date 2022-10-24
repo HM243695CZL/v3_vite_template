@@ -102,8 +102,8 @@ import CommonTop from '/@/components/CommonTop/index.vue';
 import { postAction, getAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import useCrud from '/@/hooks/useCrud';
-import TeacherModal from './component/teacherModal.vue'
-import DivideRoleModal from './component/divideRoleModal.vue';
+import TeacherModal from './component/teacher/teacherModal.vue'
+import DivideRoleModal from './component/teacher/divideRoleModal.vue';
 import { deptListApi } from '/@/api/plat/dept';
 import { ElMessage } from 'element-plus';
 
