@@ -28,9 +28,16 @@
 					list-type="picture"
 					accept='.xls,.xlsx'
 					:auto-upload='false'
+					:on-change='handleChange'
 				>
 					<span class='download'>点击上传</span>
 				</el-upload>
+				<div class='file-name'>
+					{{state.fileName}}
+					<el-icon @click='clickRemoveFile' v-if='state.fileName'>
+						<ele-CircleClose />
+					</el-icon>
+				</div>
 			</div>
 			<div class='row'>
 				4.点击确定按钮导入文档
@@ -47,9 +54,16 @@
 
 <script lang='ts' setup>
 	import { reactive } from 'vue';
-	import { downloadClassTempApi } from '/@/api/plat/class';
-	const baseUrl = import.meta.env.VITE_API_URL as any;
+	import { downloadClassTempApi, importClassTempApi } from '/@/api/plat/class';
+	import { baseUrl } from '/@/api/common';
+	import { ElMessage } from 'element-plus';
+	import { uploadAction } from '/@/api/common';
+	import { StatusEnum } from '/@/enum/status.enum';
 
+
+	const emits = defineEmits([
+		'refreshList'
+	]);
 	const state = reactive({
 		isShowDialog: false,
 		title: '班级信息导入',
@@ -61,19 +75,42 @@
 			className: '必填',
 			monitor: '选填',
 			tel: '选填'
-		}]
+		}],
+		fileName: '',
+		fileData: ''
 	});
 	const closeDialog = () => {
 		state.isShowDialog = false;
 	};
 	const openDialog = () => {
 		state.isShowDialog = true;
+		state.fileData = '';
+		state.fileName = '';
 	};
 	const downloadTemp = () => {
 		window.location.href = `${baseUrl}${downloadClassTempApi}`;
 	};
+	const handleChange = (file: any) => {
+		state.fileName = file.name;
+		state.fileData = file.raw;
+	};
+	const clickRemoveFile = () => {
+		state.fileName = '';
+	}
 	const clickConfirm = () => {
-
+		if (!state.fileData) {
+			ElMessage.error('请选择上传文件!');
+			return false;
+		}
+		const formData = new FormData();
+		formData.append('file', state.fileData);
+		uploadAction(importClassTempApi, formData).then(res => {
+			if (res.status === StatusEnum.SUCCESS) {
+				ElMessage.success(res.message);
+				closeDialog();
+				emits('refreshList');
+			}
+		})
 	};
 	defineExpose({
 		openDialog
@@ -90,7 +127,7 @@
 			justify-content: flex-start;
 			align-items: center;
 		}
-		.download{
+		.download, .file-name{
 			margin-left: 10px;
 			cursor: pointer;
 			color: #007CE9;

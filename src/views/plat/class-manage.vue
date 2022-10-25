@@ -79,6 +79,7 @@
 				/>
 				<ImportFileModal
 					ref='ImportFileModalRef'
+					@refreshList='getDataList'
 				/>
 			</div>
 		</div>
