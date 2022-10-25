@@ -122,7 +122,7 @@ export default {
 		const state = reactive({
 			uris: {
 				page: getTeacherPageApi,
-				deleteBatch: deleteTeacherApi
+				deleteBatch: deleteTeacherApi,
 			},
 			typeObj: {
 				0: '专技',

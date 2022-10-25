@@ -7,8 +7,19 @@ import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
 import _ from 'lodash';
 
-export default function(params: any) {
-	const { uris, parentRef, isMountedLoad = true, initField } = params;
+interface CrudParams {
+	uris: {
+		page?: string, // 分页查询接口
+		deleteBatch?: string, // 批量删除接口
+		delete?: string // 单个删除接口
+	},
+	parentRef?: any, // 父级ref
+	isMountedLoad?: boolean, // 是否挂载完成调用加载表格数据方法
+	initField?: string[] // 不需要重置数据的字段名
+}
+export default function({
+		uris, parentRef, isMountedLoad = true, initField = []
+	}: CrudParams) {
 	const tableRef = ref();
 	const modalFormRef = ref();
 	const state = reactive({
