@@ -13,7 +13,7 @@
 					@clickBatchDelete='clickBatchDelete'
 				>
 					<template #left>
-						<el-button size='default' type='default'>
+						<el-button size='default' type='default' @click='clickImport'>
 							<el-icon>
 								<ele-Download />
 							</el-icon>
@@ -77,6 +77,9 @@
 										:dept-list='deptList'
 										:teacher-list='teacherList'
 				/>
+				<ImportFileModal
+					ref='ImportFileModalRef'
+				/>
 			</div>
 		</div>
 	</div>
@@ -100,6 +103,7 @@ import {
 import CommonTop from '/@/components/CommonTop/index.vue';
 import useCrud from '/@/hooks/useCrud';
 import ClassModal from './component/class/classModal.vue';
+import ImportFileModal from './component/class/importFileModal.vue';
 import { getAction, postAction } from '/@/api/common';
 import { PageEntity } from '/@/domain/page.entity';
 import { PaginationUtils } from '/@/utils/paginationUtils';
@@ -111,10 +115,12 @@ export default defineComponent({
 	components: {
 		DeptTree,
 		CommonTop,
-		ClassModal
+		ClassModal,
+		ImportFileModal
 	},
 	setup() {
 		const classRef = ref();
+		const ImportFileModalRef = ref();
 		const state = reactive({
 			uris: {
 				page: getClassPageApi,
@@ -177,6 +183,9 @@ export default defineComponent({
 				}
 			})
 		};
+		const clickImport = () => {
+			ImportFileModalRef.value.openDialog();
+		};
 		onMounted(() => {
 			getSchoolAreaList();
 			getDeptList();
@@ -184,7 +193,9 @@ export default defineComponent({
 		});
 		return {
 			clickNode,
+			clickImport,
 			classRef,
+			ImportFileModalRef,
 			...toRefs(state),
 
 			clickAdd,

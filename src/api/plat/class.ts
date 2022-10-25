@@ -6,3 +6,4 @@ export const createClassApi = `${classBaseApi}create`;
 export const updateClassApi = `${classBaseApi}update`;
 export const deleteClassPageApi = `${classBaseApi}delete`;
 export const batchDeleteClassApi = `${classBaseApi}deleteAll`;
+export const downloadClassTempApi = `${classBaseApi}down/downMBExcel`;

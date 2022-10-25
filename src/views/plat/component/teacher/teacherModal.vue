@@ -47,18 +47,14 @@
 					<el-col :span='12'>
 						<div class='avatar-box'>
 							<img class='avatar-img' :src='state.avatarImg' alt=''>
-							<el-upload
-								class="upload-demo"
-								:headers='state.headerInfo'
-								:action="state.uploadUrl"
-								:data='{moduleName: "teacher"}'
-								:on-success='handleSuccess'
+							<SingleUpload
+								@uploadSuccess='handleSuccess'
+								accept-file='.png,.jpg,.jpeg,.bmg,.gif'
+								module-name='teacher'
+								btn-text='更换头像'
 								:show-file-list='false'
-								list-type="picture"
-								accept='.png,.jpg,.jpeg,.bmg,.gif'
-							>
-								<el-button type="default">更换头像</el-button>
-							</el-upload>
+								:source='state.source'
+							/>
 						</div>
 						<el-form-item label='任职类型' prop='workType'>
 							<el-select class='w100' filterable placeholder='请选择任职类型' v-model='state.ruleForm.workType'>
@@ -88,15 +84,12 @@
 
 <script lang='ts' setup>
 import { nextTick, reactive, ref } from 'vue';
-import { SERVER_NAME } from '/@/utils/config';
-import { Session } from '/@/utils/storage';
 import { StatusEnum } from '/@/enum/status.enum';
 import { createTeacherApi, updateTeacherApi } from '/@/api/plat/teacher';
-import { postAction } from '/@/api/common';
+import { postAction, reviewFileUrl } from '/@/api/common';
 import userAvatar from '/@/assets/user/photo0.png';
 import { ElMessage } from 'element-plus';
-const baseUrl = import.meta.env.VITE_API_URL as any;
-const preUrl = `${baseUrl}${SERVER_NAME.SECURITY_SERVER}source/view/`;
+import SingleUpload from '/@/components/Upload/SingleUpload.vue';
 const props = defineProps({
 	deptList: {
 		type: Array,
@@ -130,11 +123,6 @@ const formRef = ref();
 const state = reactive({
 	isShowDialog: false,
 	title: '',
-	uploadUrl: `${baseUrl}${SERVER_NAME.UPLOAD_URL}`,
-	headerInfo: {
-		Authorization: Session.get('token'),
-		enctype: 'multipart/form-data'
-	},
 	avatarImg: userAvatar,
 	ruleForm: {
 		id: '',
@@ -172,7 +160,8 @@ const state = reactive({
 		workType: [
 			{ required: true, message: '任职类型不能为空', trigger: 'change' }
 		]
-	}
+	},
+	source: {} as any
 });
 const closeDialog = () => {
 	state.isShowDialog = false;
@@ -181,6 +170,7 @@ const openDialog = (row: any) => {
 	state.isShowDialog = true;
 	state.ruleForm.id = '';
 	state.avatarImg = userAvatar;
+	state.source = {};
 	nextTick(() => {
 		formRef.value.resetFields();
 		if (row) {
@@ -189,7 +179,8 @@ const openDialog = (row: any) => {
 			state.ruleForm.type = row.type + '';
 			state.ruleForm.sex = row.sex + '';
 			if (row.photo) {
-				state.avatarImg = `${preUrl}${row.photoSource.moduleName}/${row.photoSource.fileNewName}`;
+				state.source = row.photoSource;
+				state.avatarImg = `${reviewFileUrl}${row.photoSource.moduleName}/${row.photoSource.fileNewName}`;
 			}
 		} else {
 			state.title = '新增教师';
@@ -211,11 +202,9 @@ const clickConfirm = () => {
 	})
 };
 const handleSuccess = (res: any) => {
-	if (res.status === StatusEnum.SUCCESS) {
-		ElMessage.success(res.message);
-		state.avatarImg = `${preUrl}${res.datas.moduleName}/${res.datas.fileNewName}`;
-		state.ruleForm.photo = res.datas.id;
-	}
+	state.source = res.datas;
+	state.avatarImg = `${reviewFileUrl}${res.datas.moduleName}/${res.datas.fileNewName}`;
+	state.ruleForm.photo = res.datas.id;
 };
 defineExpose({
 	openDialog
