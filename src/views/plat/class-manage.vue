@@ -12,6 +12,20 @@
 					@clickReset='clickReset'
 					@clickBatchDelete='clickBatchDelete'
 				>
+					<template #left>
+						<el-button size='default' type='default'>
+							<el-icon>
+								<ele-Download />
+							</el-icon>
+							导入
+						</el-button>
+						<el-button size='default' type='default'>
+							<el-icon>
+								<ele-Upload />
+							</el-icon>
+							导出
+						</el-button>
+					</template>
 					<template #right>
 						<el-form-item label='班级名称'>
 							<el-input placeholder='请输入班级名称' v-model='searchParams.name'></el-input>
@@ -57,23 +71,47 @@
 					:total="pageInfo.totalRecords"
 				>
 				</el-pagination>
+				<ClassModal ref='modalFormRef'
+										@refreshList='clickReset'
+										:school-area-list='schoolAreaList'
+										:dept-list='deptList'
+										:teacher-list='teacherList'
+				/>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script lang='ts'>
-import { defineComponent, reactive, ref, toRefs } from 'vue';
+import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue';
 import DeptTree from '/@/components/DeptTree/index.vue';
-import { batchDeleteClassApi, deleteClassPageApi, getClassPageApi } from '/@/api/plat/class';
+import {
+	batchDeleteClassApi, deleteClassPageApi, getClassPageApi
+} from '/@/api/plat/class';
+import {
+	dictPageApi
+} from '/@/api/plat/dictionary';
+import {
+	deptListApi
+} from '/@/api/plat/dept';
+import {
+	getTeacherListApi
+} from '/@/api/plat/teacher';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import useCrud from '/@/hooks/useCrud';
+import ClassModal from './component/class/classModal.vue';
+import { getAction, postAction } from '/@/api/common';
+import { PageEntity } from '/@/domain/page.entity';
+import { PaginationUtils } from '/@/utils/paginationUtils';
+import { FilterEnum } from '/@/enum/filter.enum';
+import { StatusEnum } from '/@/enum/status.enum';
 
 export default defineComponent({
 	name: 'class-manage',
 	components: {
 		DeptTree,
-		CommonTop
+		CommonTop,
+		ClassModal
 	},
 	setup() {
 		const classRef = ref();
@@ -84,6 +122,10 @@ export default defineComponent({
 				delete: deleteClassPageApi
 			},
 			otherHeight: 156, // 20 + 20 + 36 + 15 + 50 + 15
+			pageInfo: new PageEntity(),
+			schoolAreaList: [] as any,
+			deptList: [] as any,
+			teacherList: [] as any
 		});
 		const {
 			clickAdd,
@@ -113,6 +155,33 @@ export default defineComponent({
 			searchParams.value.majorId = node.key;
 			clickSearch();
 		};
+		const getSchoolAreaList = () => {
+			state.pageInfo.filters.type = PaginationUtils.filters('school-type', FilterEnum.CONTAINS);
+			postAction(dictPageApi, state.pageInfo).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.schoolAreaList = res.datas.data;
+				}
+			})
+		};
+		const getDeptList = () => {
+			getAction(deptListApi, '').then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.deptList = res.datas;
+				}
+			})
+		};
+		const getTeacherList = () => {
+			postAction(getTeacherListApi, {}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.teacherList = res.datas;
+				}
+			})
+		};
+		onMounted(() => {
+			getSchoolAreaList();
+			getDeptList();
+			getTeacherList();
+		});
 		return {
 			clickNode,
 			classRef,

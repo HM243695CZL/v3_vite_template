@@ -18,6 +18,7 @@
 															:data='deptList'
 															:check-strictly='true'
 															placeholder='请选择部门'
+															filterable
 															class='w100'
 															:props='{
 																label: "title",
@@ -25,17 +26,17 @@
 															}' />
 						</el-form-item>
 						<el-form-item label='职务' prop='position'>
-							<el-select class='w100' placeholder='请选择职务' v-model='state.ruleForm.position'>
+							<el-select class='w100' filterable placeholder='请选择职务' v-model='state.ruleForm.position'>
 								<el-option v-for='item in positionList' :key='item.id' :label='item.label' :value='item.value'></el-option>
 							</el-select>
 						</el-form-item>
 						<el-form-item label='职称' prop='title'>
-							<el-select class='w100' placeholder='请选择职称' v-model='state.ruleForm.title'>
+							<el-select class='w100' filterable placeholder='请选择职称' v-model='state.ruleForm.title'>
 								<el-option v-for='item in titleList' :key='item.id' :label='item.label' :value='item.value'></el-option>
 							</el-select>
 						</el-form-item>
 						<el-form-item label='岗位类型' prop='type'>
-							<el-select class='w100' placeholder='请选择岗位类型' v-model='state.ruleForm.type'>
+							<el-select class='w100' filterable placeholder='请选择岗位类型' v-model='state.ruleForm.type'>
 								<el-option v-for='(val, key) in typeList' :key='key' :label='val' :value='key'></el-option>
 							</el-select>
 						</el-form-item>
@@ -60,12 +61,12 @@
 							</el-upload>
 						</div>
 						<el-form-item label='任职类型' prop='workType'>
-							<el-select class='w100' placeholder='请选择任职类型' v-model='state.ruleForm.workType'>
+							<el-select class='w100' filterable placeholder='请选择任职类型' v-model='state.ruleForm.workType'>
 								<el-option v-for='item in workTypeList' :key='item.id' :label='item.label' :value='item.value'></el-option>
 							</el-select>
 						</el-form-item>
 						<el-form-item label='性别' prop='sex'>
-							<el-select class='w100' placeholder='请选择性别' v-model='state.ruleForm.sex'>
+							<el-select class='w100' filterable placeholder='请选择性别' v-model='state.ruleForm.sex'>
 								<el-option v-for='(val, key) in sexList' :key='key' :label='val' :value='key'></el-option>
 							</el-select>
 						</el-form-item>
