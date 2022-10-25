@@ -64,6 +64,10 @@ service.interceptors.response.use(
 			}
 			return Promise.reject(service.interceptors.response);
 		} else {
+			// 响应流文件时直接返回
+			if (response.data.type) {
+				return response;
+			}
 			return response.data;
 		}
 	},

@@ -19,12 +19,20 @@
 							</el-icon>
 							导入
 						</el-button>
-						<el-button size='default' type='default'>
-							<el-icon>
-								<ele-Upload />
-							</el-icon>
-							导出
-						</el-button>
+						<el-dropdown>
+							<el-button size='default' type='default' class='ml10'>
+								<el-icon>
+									<ele-Upload />
+								</el-icon>
+								导出
+							</el-button>
+							<template #dropdown>
+								<el-dropdown-menu>
+									<el-dropdown-item @click='exportShow(1)'>导出选中</el-dropdown-item>
+									<el-dropdown-item @click='exportShow(3)'>导出全部</el-dropdown-item>
+								</el-dropdown-menu>
+							</template>
+						</el-dropdown>
 					</template>
 					<template #right>
 						<el-form-item label='班级名称'>
@@ -90,7 +98,8 @@
 import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue';
 import DeptTree from '/@/components/DeptTree/index.vue';
 import {
-	batchDeleteClassApi, deleteClassPageApi, getClassPageApi
+	batchDeleteClassApi, deleteClassPageApi, getClassPageApi,
+	exportClassDataApi
 } from '/@/api/plat/class';
 import {
 	dictPageApi
@@ -105,11 +114,12 @@ import CommonTop from '/@/components/CommonTop/index.vue';
 import useCrud from '/@/hooks/useCrud';
 import ClassModal from './component/class/classModal.vue';
 import ImportFileModal from './component/class/importFileModal.vue';
-import { getAction, postAction } from '/@/api/common';
+import {  getAction, postAction } from '/@/api/common';
 import { PageEntity } from '/@/domain/page.entity';
 import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum } from '/@/enum/filter.enum';
 import { StatusEnum } from '/@/enum/status.enum';
+import { postDownLoad } from '/@/utils/postdown';
 
 export default defineComponent({
 	name: 'class-manage',
@@ -149,6 +159,7 @@ export default defineComponent({
 			pageInfo,
 			dataList,
 			tableRef,
+			selectedRowKeys,
 			modalFormRef,
 			searchParams,
 			tableHeight
@@ -187,6 +198,21 @@ export default defineComponent({
 		const clickImport = () => {
 			ImportFileModalRef.value.openDialog();
 		};
+		const exportShow = (mode: number) => {
+			const obj = {
+				1: {
+					mode,
+					pager: {},
+					sourceIds: selectedRowKeys
+				},
+				3: {
+					mode,
+					pager: pageInfo,
+					sourceIds: []
+				}
+			}
+			postDownLoad(exportClassDataApi, obj[mode]);
+		};
 		onMounted(() => {
 			getSchoolAreaList();
 			getDeptList();
@@ -195,6 +221,7 @@ export default defineComponent({
 		return {
 			clickNode,
 			clickImport,
+			exportShow,
 			classRef,
 			ImportFileModalRef,
 			...toRefs(state),

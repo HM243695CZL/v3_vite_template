@@ -8,3 +8,4 @@ export const deleteClassPageApi = `${classBaseApi}delete`;
 export const batchDeleteClassApi = `${classBaseApi}deleteAll`;
 export const downloadClassTempApi = `${classBaseApi}down/downMBExcel`;
 export const importClassTempApi = `${classBaseApi}classesImport`;
+export const exportClassDataApi = `${classBaseApi}exportExcel2`;

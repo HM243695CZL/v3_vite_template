@@ -29,3 +29,13 @@ export function uploadAction(url: string, data: any) {
 		headers: { 'Content-Type': 'multipart/form-data' },
 	})
 }
+
+export function exportAction(url: string, data: any) {
+	return request({
+		url,
+		method: 'post',
+		data,
+		observe: 'response',
+		responseType: 'blob'
+	})
+}
