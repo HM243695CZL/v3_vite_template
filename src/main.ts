@@ -33,6 +33,10 @@ VXETable.setup({
 		},
 		sortConfig: {
 			remote: true // 开启后端排序
+		},
+		rowConfig: {
+			useKey: true,
+			keyField: 'id'
 		}
 	}
 })

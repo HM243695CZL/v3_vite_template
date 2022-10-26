@@ -50,10 +50,6 @@
 					ref='tableRef'
 					:data='dataList'
 					:max-height='tableHeight - otherHeight'
-					:row-config='{
-						useKey: true,
-						keyField: "id"
-					}'
 					@checkbox-all='selectionChange'
 					@checkbox-change='selectionChange'
 				>
