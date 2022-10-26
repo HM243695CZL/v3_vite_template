@@ -120,6 +120,7 @@ import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum } from '/@/enum/filter.enum';
 import { StatusEnum } from '/@/enum/status.enum';
 import { postDownLoad } from '/@/utils/postdown';
+import { ElMessage } from 'element-plus';
 
 export default defineComponent({
 	name: 'class-manage',
@@ -203,13 +204,17 @@ export default defineComponent({
 				1: {
 					mode,
 					pager: {},
-					sourceIds: selectedRowKeys
+					sourceIds: selectedRowKeys.value
 				},
 				3: {
 					mode,
-					pager: pageInfo,
+					pager: pageInfo.value,
 					sourceIds: []
 				}
+			}
+			if (mode === 1 && selectedRowKeys.value.length === 0) {
+				ElMessage.error('请选择至少一条数据');
+				return false;
 			}
 			postDownLoad(exportClassDataApi, obj[mode]);
 		};
