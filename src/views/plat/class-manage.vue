@@ -3,7 +3,13 @@
 		<div class='content-container h100'>
 			<div class='tree-box h100'>
 				<div class='title'>学院/专业管理</div>
-				<DeptTree @clickNode='clickNode' />
+				<DeptTree @clickNode='clickNode'
+									:tree-data='deptWithMajorList'
+									:tree-props='{
+										label: "name",
+										children: "childrenList"
+									}'
+									/>
 			</div>
 			<div class='class-manage-box h100'>
 				<CommonTop
@@ -105,7 +111,7 @@ import {
 	dictPageApi
 } from '/@/api/plat/dictionary';
 import {
-	deptListApi
+	deptListApi, getTreeDeptWithMajorApi
 } from '/@/api/plat/dept';
 import {
 	getTeacherListApi
@@ -133,6 +139,7 @@ export default defineComponent({
 	setup() {
 		const classRef = ref();
 		const ImportFileModalRef = ref();
+		const MajorModalRef = ref();
 		const state = reactive({
 			uris: {
 				page: getClassPageApi,
@@ -143,6 +150,7 @@ export default defineComponent({
 			pageInfo: new PageEntity(),
 			schoolAreaList: [] as any,
 			deptList: [] as any,
+			deptWithMajorList: [] as any,
 			teacherList: [] as any
 		});
 		const {
@@ -196,6 +204,13 @@ export default defineComponent({
 				}
 			})
 		};
+		const getDeptWithMajorList = () => {
+			postAction(getTreeDeptWithMajorApi, {}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.deptWithMajorList = res.datas;
+				}
+			})
+		};
 		const clickImport = () => {
 			ImportFileModalRef.value.openDialog();
 		};
@@ -222,6 +237,7 @@ export default defineComponent({
 			getSchoolAreaList();
 			getDeptList();
 			getTeacherList();
+			getDeptWithMajorList();
 		});
 		return {
 			clickNode,
@@ -229,6 +245,7 @@ export default defineComponent({
 			exportShow,
 			classRef,
 			ImportFileModalRef,
+			MajorModalRef,
 			...toRefs(state),
 
 			clickAdd,

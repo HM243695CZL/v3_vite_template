@@ -142,6 +142,7 @@ const props = defineProps({
 			formRef.value.resetFields();
 			if (row) {
 				state.title = '修改班级';
+				console.log(row.collageId);
 				state.ruleForm = row;
 				changeCollege(row.collageId);
 			} else {
