@@ -25,9 +25,6 @@
 			@checkbox-all='selectionChange'
 			@checkbox-change='selectionChange'
 			@filter-change='filterChange'
-			:sort-config='{
-				remote: true
-			}'
 			@sort-change='sortChange'
 		>
 			<vxe-column type='checkbox' width='60' />

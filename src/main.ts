@@ -31,6 +31,9 @@ VXETable.setup({
 			iconNone: 'vxe-icon-search', // 设置筛选图标
 			iconMatch: 'vxe-icon-search', // 设置筛选图标
 		},
+		sortConfig: {
+			remote: true // 开启后端排序
+		}
 	}
 })
 directive(app);
