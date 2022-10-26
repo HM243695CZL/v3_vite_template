@@ -83,132 +83,132 @@
 </template>
 
 <script lang='ts' setup>
-import { nextTick, reactive, ref } from 'vue';
-import { StatusEnum } from '/@/enum/status.enum';
-import { createTeacherApi, updateTeacherApi } from '/@/api/plat/teacher';
-import { postAction, reviewFileUrl } from '/@/api/common';
-import userAvatar from '/@/assets/user/photo0.png';
-import { ElMessage } from 'element-plus';
-import SingleUpload from '/@/components/Upload/SingleUpload.vue';
-const props = defineProps({
-	deptList: {
-		type: Array,
-		required: true
-	},
-	positionList: {
-		type: Array,
-		required: true
-	},
-	titleList: {
-		type: Array,
-		required: true
-	},
-	typeList: {
-		type: Object,
-		required: true
-	},
-	workTypeList: {
-		type: Array,
-		required: true
-	},
-	sexList: {
-		type: Object,
-		required: true
-	}
-});
-const emits = defineEmits([
-	'refreshList'
-]);
-const formRef = ref();
-const state = reactive({
-	isShowDialog: false,
-	title: '',
-	avatarImg: userAvatar,
-	ruleForm: {
-		id: '',
-		name: '',
-		number: '',
-		orgId: '',
-		position: '',
-		title: '',
-		type: '' ,
-		telphone: '',
-		photo: '',
-		workType: '',
-		sex: '',
-		email: ''
-	},
-	rules: {
-		name: [
-			{ required: true, message: '姓名不能为空', trigger: 'blur' }
-		],
-		number: [
-			{ required: true, message: '工号不能为空', trigger: 'blur' }
-		],
-		orgId: [
-			{ required: true, message: '部门不能为空', trigger: 'change' }
-		],
-		position: [
-			{ required: true, message: '职务不能为空', trigger: 'change' }
-		],
-		title: [
-			{ required: true, message: '职称不能为空', trigger: 'change' }
-		],
-		type: [
-			{ required: true, message: '岗位类型不能为空', trigger: 'change' }
-		],
-		workType: [
-			{ required: true, message: '任职类型不能为空', trigger: 'change' }
-		]
-	},
-	source: {} as any
-});
-const closeDialog = () => {
-	state.isShowDialog = false;
-};
-const openDialog = (row: any) => {
-	state.isShowDialog = true;
-	state.ruleForm.id = '';
-	state.avatarImg = userAvatar;
-	state.source = {};
-	nextTick(() => {
-		formRef.value.resetFields();
-		if (row) {
-			state.title = '修改教师';
-			state.ruleForm = row;
-			state.ruleForm.type = row.type + '';
-			state.ruleForm.sex = row.sex + '';
-			if (row.photo) {
-				state.source = row.photoSource;
-				state.avatarImg = `${reviewFileUrl}${row.photoSource.moduleName}/${row.photoSource.fileNewName}`;
-			}
-		} else {
-			state.title = '新增教师';
+	import { nextTick, reactive, ref } from 'vue';
+	import { StatusEnum } from '/@/enum/status.enum';
+	import { createTeacherApi, updateTeacherApi } from '/@/api/plat/teacher';
+	import { postAction, reviewFileUrl } from '/@/api/common';
+	import userAvatar from '/@/assets/user/photo0.png';
+	import { ElMessage } from 'element-plus';
+	import SingleUpload from '/@/components/Upload/SingleUpload.vue';
+	const props = defineProps({
+		deptList: {
+			type: Array,
+			required: true
+		},
+		positionList: {
+			type: Array,
+			required: true
+		},
+		titleList: {
+			type: Array,
+			required: true
+		},
+		typeList: {
+			type: Object,
+			required: true
+		},
+		workTypeList: {
+			type: Array,
+			required: true
+		},
+		sexList: {
+			type: Object,
+			required: true
 		}
 	});
-
-};
-const clickConfirm = () => {
-	formRef.value.validate((valid: boolean) => {
-		if (valid) {
-			postAction(state.ruleForm.id ? updateTeacherApi : createTeacherApi, state.ruleForm).then(res => {
-				if (res.status === StatusEnum.SUCCESS) {
-					ElMessage.success(res.message);
-					closeDialog();
-					emits('refreshList');
+	const emits = defineEmits([
+		'refreshList'
+	]);
+	const formRef = ref();
+	const state = reactive({
+		isShowDialog: false,
+		title: '',
+		avatarImg: userAvatar,
+		ruleForm: {
+			id: '',
+			name: '',
+			number: '',
+			orgId: '',
+			position: '',
+			title: '',
+			type: '' ,
+			telphone: '',
+			photo: '',
+			workType: '',
+			sex: '',
+			email: ''
+		},
+		rules: {
+			name: [
+				{ required: true, message: '姓名不能为空', trigger: 'blur' }
+			],
+			number: [
+				{ required: true, message: '工号不能为空', trigger: 'blur' }
+			],
+			orgId: [
+				{ required: true, message: '部门不能为空', trigger: 'change' }
+			],
+			position: [
+				{ required: true, message: '职务不能为空', trigger: 'change' }
+			],
+			title: [
+				{ required: true, message: '职称不能为空', trigger: 'change' }
+			],
+			type: [
+				{ required: true, message: '岗位类型不能为空', trigger: 'change' }
+			],
+			workType: [
+				{ required: true, message: '任职类型不能为空', trigger: 'change' }
+			]
+		},
+		source: {} as any
+	});
+	const closeDialog = () => {
+		state.isShowDialog = false;
+	};
+	const openDialog = (row: any) => {
+		state.isShowDialog = true;
+		state.ruleForm.id = '';
+		state.avatarImg = userAvatar;
+		state.source = {};
+		nextTick(() => {
+			formRef.value.resetFields();
+			if (row) {
+				state.title = '修改教师';
+				state.ruleForm = row;
+				state.ruleForm.type = row.type + '';
+				state.ruleForm.sex = row.sex + '';
+				if (row.photo) {
+					state.source = row.photoSource;
+					state.avatarImg = `${reviewFileUrl}${row.photoSource.moduleName}/${row.photoSource.fileNewName}`;
 				}
-			})
-		}
-	})
-};
-const handleSuccess = (res: any) => {
-	state.source = res.datas;
-	state.avatarImg = `${reviewFileUrl}${res.datas.moduleName}/${res.datas.fileNewName}`;
-	state.ruleForm.photo = res.datas.id;
-};
-defineExpose({
-	openDialog
-});
+			} else {
+				state.title = '新增教师';
+			}
+		});
+
+	};
+	const clickConfirm = () => {
+		formRef.value.validate((valid: boolean) => {
+			if (valid) {
+				postAction(state.ruleForm.id ? updateTeacherApi : createTeacherApi, state.ruleForm).then(res => {
+					if (res.status === StatusEnum.SUCCESS) {
+						ElMessage.success(res.message);
+						closeDialog();
+						emits('refreshList');
+					}
+				})
+			}
+		})
+	};
+	const handleSuccess = (res: any) => {
+		state.source = res.datas;
+		state.avatarImg = `${reviewFileUrl}${res.datas.moduleName}/${res.datas.fileNewName}`;
+		state.ruleForm.photo = res.datas.id;
+	};
+	defineExpose({
+		openDialog
+	});
 </script>
 
 <style scoped lang='scss'>

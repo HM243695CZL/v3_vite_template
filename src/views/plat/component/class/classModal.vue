@@ -134,6 +134,7 @@ const props = defineProps({
 	const openDialog = (row: any) => {
 		state.isShowDialog = true;
 		state.ruleForm.id = '';
+		state.majorList = [];
 		let currentYear = new Date().getFullYear();
 		for (let i = 0; i <= 4; i ++) {
 			state.yearList.unshift(currentYear --);
@@ -142,7 +143,6 @@ const props = defineProps({
 			formRef.value.resetFields();
 			if (row) {
 				state.title = '修改班级';
-				console.log(row.collageId);
 				state.ruleForm = row;
 				changeCollege(row.collageId);
 			} else {
@@ -173,8 +173,10 @@ const props = defineProps({
 	const changeCollege = (collegeId: string) => {
 		postAction(getMajorListApi, [collegeId]).then(res => {
 			if (res.status === StatusEnum.SUCCESS) {
+				state.majorList = [];
 				if (res.datas.length === 0) {
 					ElMessage.error('该部门下暂无专业');
+					state.ruleForm.majorId = '';
 					return false;
 				}
 				state.majorList = res.datas;

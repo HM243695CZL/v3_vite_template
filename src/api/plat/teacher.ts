@@ -6,4 +6,3 @@ export const deleteTeacherApi = `${teacherBaseApi}delete`;
 export const createTeacherApi = `${teacherBaseApi}create`;
 export const updateTeacherApi = `${teacherBaseApi}update`;
 export const getTeacherListApi = `${teacherBaseApi}list`;
-export const resetPasswordApi = `${SERVER_NAME.SECURITY_SERVER}sys/user/resetPassword`;

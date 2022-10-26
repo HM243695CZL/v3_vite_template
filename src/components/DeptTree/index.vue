@@ -4,7 +4,7 @@
 			ref='deptTreeRef'
 			:data="props.treeData"
 			:props="props.treeProps"
-			node-key='key'
+			node-key='id'
 			highlight-current
 			@node-click="clickNode" >
 			<template #default='{node, data}'>
@@ -20,7 +20,7 @@
 </template>
 
 <script lang='ts' setup>
-import { ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps({
 	canOperate: {
@@ -47,8 +47,10 @@ const deptTreeRef = ref();
 
 watch(props, newProps => {
 	if (newProps.treeData.length > 0) {
-		deptTreeRef.value.setCurrentKey(props.treeData[0].key);
-		clickNode(props.treeData[0]);
+		nextTick(() => {
+			deptTreeRef.value.setCurrentKey(props.treeData[0].id);
+			clickNode(props.treeData[0]);
+		})
 	}
 });
 

@@ -312,6 +312,19 @@ export function verifyIdCard(val: string) {
 }
 
 /**
+ * el-form表单验证   验证身份证
+ * @param rule rule
+ * @param value 值
+ * @param cb 回调函数
+ */
+export function verifyElFormIdCard(rule: any, value: any, cb: any) {
+	if (value === '') return true;
+	// false: 身份证不正确
+	if (!/^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/.test(value)) return false;
+	// true: 身份证正确
+	else return true;
+}
+/**
  * 姓名
  * @param val 当前值字符串
  * @returns 返回 true: 姓名正确

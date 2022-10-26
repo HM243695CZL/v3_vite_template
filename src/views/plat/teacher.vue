@@ -89,7 +89,6 @@
 <script lang='ts'>
 import { reactive, ref, toRefs, onMounted, nextTick } from 'vue';
 import {
-	resetPasswordApi,
 	getTeacherPageApi,
 	deleteTeacherApi
 } from '/@/api/plat/teacher';
@@ -106,6 +105,7 @@ import TeacherModal from './component/teacher/teacherModal.vue'
 import DivideRoleModal from './component/teacher/divideRoleModal.vue';
 import { deptListApi } from '/@/api/plat/dept';
 import { ElMessage } from 'element-plus';
+import { resetPasswordApi } from '/@/api/plat/user';
 
 export default {
 	name: 'teacher',

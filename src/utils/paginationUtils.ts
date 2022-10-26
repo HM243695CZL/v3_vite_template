@@ -28,19 +28,19 @@ export class PaginationUtils {
    * @param page 分页对象
    * @param sort 排序对象
    */
-  public static sort(page: PageEntity, sort: { key: string; value: string }): PageEntity {
+  public static sort(page: PageEntity, sort: { field: string; order: string }): PageEntity {
     if (!page) {
       throw new Error('分页数据异常，无法处理排序');
     }
     // 直接对该排序字段进行过滤，如果存在直接删除
-    page.multiSortMeta = _.filter(page.multiSortMeta, (el) => el.field !== sort.key);
+    page.multiSortMeta = _.filter(page.multiSortMeta, (el) => el.field !== sort.field);
     // 需要对排序字段进行排序处理，排序value情况有三种，descend=降序 ascend=升序 null=取消排序
-    if (sort.value === 'descend') {
+    if (sort.order === 'desc') {
       // 降序
-      page.multiSortMeta.push({field: sort.key, order: -1});
-    } else if (sort.value === 'ascend') {
+      page.multiSortMeta.push({field: sort.field, order: -1});
+    } else if (sort.order === 'asc') {
       // 升序,因为数据库默认升序
-      page.multiSortMeta.push({field: sort.key, order: 1});
+      page.multiSortMeta.push({field: sort.field, order: 1});
     } else {
       // sort.value === 'null' 这种情况直接不处理
     }

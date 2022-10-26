@@ -133,6 +133,7 @@ export default defineComponent({
 				code: state.ruleForm.code
 			}).then(async res => {
 				const {status, datas} = res;
+				state.loading.signIn = false;
 				if (status === StatusEnum.SUCCESS) {
 					const { menus, token, user } = datas;
 					// 存储 token 到浏览器缓存

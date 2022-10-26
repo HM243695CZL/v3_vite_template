@@ -116,7 +116,17 @@ export default function({
 		clickSearch();
 	};
 	/**
+	 * 构建排序数据
+	 * @param field 字段名称
+	 * @param order 排序
+	 */
+	const sortChange = ({ field, order }) => {
+		state.pageInfo = PaginationUtils.sort(state.pageInfo, { field, order })
+		clickSearch();
+	};
+	/**
 	 * 选中表格数据
+	 * @param selectionRows 选择的数据
 	 */
 	const selectionChange = (selectionRows: any) => {
 		if (!tableRef.value.rowConfig) {
@@ -152,6 +162,7 @@ export default function({
 	};
 	/**
 	 * 单个删除
+	 * @param id id
 	 */
 	const clickDelete = (id: string) => {
 		if (!uris.delete) {
@@ -200,6 +211,7 @@ export default function({
 		clickSearch,
 		clickReset,
 		filterChange,
+		sortChange,
 		selectionChange,
 		clickDelete,
 		clickBatchDelete,

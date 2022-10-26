@@ -179,7 +179,7 @@ export default defineComponent({
 			initField: ['majorId']
 		});
 		const clickNode = node => {
-			searchParams.value.majorId = node.key;
+			searchParams.value.majorId = node.id;
 			clickSearch();
 		};
 		const getSchoolAreaList = () => {
