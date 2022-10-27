@@ -5,6 +5,28 @@
 			@clickSearch='clickSearch'
 			@clickReset='clickReset'
 			@clickBatchDelete='clickBatchDelete'>
+			<template #left>
+				<el-button size='default' type='default' @click='clickImport'>
+					<el-icon>
+						<ele-Download />
+					</el-icon>
+					导入
+				</el-button>
+				<el-dropdown>
+					<el-button size='default' type='default' class='ml10'>
+						<el-icon>
+							<ele-Upload />
+						</el-icon>
+						导出
+					</el-button>
+					<template #dropdown>
+						<el-dropdown-menu>
+							<el-dropdown-item @click='exportPage(1)'>导出选中</el-dropdown-item>
+							<el-dropdown-item @click='exportPage(3)'>导出全部</el-dropdown-item>
+						</el-dropdown-menu>
+					</template>
+				</el-dropdown>
+			</template>
 			<template #right>
 				<el-form-item label='姓名'>
 					<el-input placeholder='请输入姓名' v-model='searchParams.name'></el-input>
@@ -16,6 +38,10 @@
 		</CommonTop>
 		<vxe-table
 			ref='tableRef'
+			:row-config='{
+				useKey: true,
+				keyField: "id"
+			}'
 			:data='dataList'
 			:max-height='tableHeight - otherHeight'
 			@checkbox-all='selectionChange'
@@ -91,6 +117,9 @@
 			:sex-list='sexObj'
 			:student-type-list='studentTypeList'
 		/>
+		<StuImportFileModal
+			ref='StuImportFileModalRef'
+		/>
 	</div>
 </template>
 
@@ -98,7 +127,7 @@
 import { defineComponent, nextTick, onMounted, reactive, ref, toRefs } from 'vue';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import useCrud from '/@/hooks/useCrud';
-import { getStudentPageApi, deleteStudentApi } from '/@/api/plat/student';
+import { getStudentPageApi, deleteStudentApi, exportStuPageApi } from '/@/api/plat/student';
 import { dictPageApi } from '/@/api/plat/dictionary';
 import { PageEntity } from '/@/domain/page.entity';
 import { PaginationUtils } from '/@/utils/paginationUtils';
@@ -106,6 +135,7 @@ import { FilterEnum } from '/@/enum/filter.enum';
 import { getAction, postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import StudentModal from './component/student/studentModal.vue';
+import StuImportFileModal from './component/student/importFileModal.vue';
 import { deptListApi } from '/@/api/plat/dept';
 import { resetPasswordApi } from '/@/api/plat/user';
 import { ElMessage } from 'element-plus';
@@ -114,16 +144,19 @@ export default defineComponent({
 	name: 'student',
 	components: {
 		CommonTop,
-		StudentModal
+		StudentModal,
+		StuImportFileModal
 	},
 	setup() {
 		const studentRef = ref();
+		const StuImportFileModalRef = ref();
 		const state = reactive({
 			stuTypePageInfo: new PageEntity(),
 			schoolAreaPageInfo: new PageEntity(),
 			uris: {
 				page: getStudentPageApi,
-				deleteBatch: deleteStudentApi
+				deleteBatch: deleteStudentApi,
+				exportUrl: exportStuPageApi
 			},
 			sexObj: {
 				0: '男',
@@ -153,6 +186,7 @@ export default defineComponent({
 			selectionChange,
 			clickSearch,
 			clickReset,
+			exportPage,
 			clickBatchDelete,
 			pageInfo,
 			dataList,
@@ -237,6 +271,9 @@ export default defineComponent({
 				}
 			})
 		};
+		const clickImport = () => {
+			StuImportFileModalRef.value.openDialog();
+		};
 		onMounted(() => {
 			getSexList();
 			getTypeList();
@@ -247,7 +284,9 @@ export default defineComponent({
 		return {
 			clickResetPassword,
 			clickDelete,
+			clickImport,
 			studentRef,
+			StuImportFileModalRef,
 			...toRefs(state),
 
 			clickAdd,
@@ -260,6 +299,7 @@ export default defineComponent({
 			sortChange,
 			clickSearch,
 			clickReset,
+			exportPage,
 			clickBatchDelete,
 			selectionChange,
 			pageInfo,

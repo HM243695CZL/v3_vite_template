@@ -34,8 +34,8 @@
 							</el-button>
 							<template #dropdown>
 								<el-dropdown-menu>
-									<el-dropdown-item @click='exportShow(1)'>导出选中</el-dropdown-item>
-									<el-dropdown-item @click='exportShow(3)'>导出全部</el-dropdown-item>
+									<el-dropdown-item @click='exportPage(1)'>导出选中</el-dropdown-item>
+									<el-dropdown-item @click='exportPage(3)'>导出全部</el-dropdown-item>
 								</el-dropdown-menu>
 							</template>
 						</el-dropdown>
@@ -48,6 +48,10 @@
 				</CommonTop>
 				<vxe-table
 					ref='tableRef'
+					:row-config='{
+						useKey: true,
+						keyField: "id"
+					}'
 					:data='dataList'
 					:max-height='tableHeight - otherHeight'
 					@checkbox-all='selectionChange'
@@ -87,8 +91,8 @@
 										:dept-list='deptList'
 										:teacher-list='teacherList'
 				/>
-				<ImportFileModal
-					ref='ImportFileModalRef'
+				<ClassImportFileModal
+					ref='ClassImportFileModalRef'
 					@refreshList='getDataList'
 				/>
 			</div>
@@ -115,7 +119,7 @@ import {
 import CommonTop from '/@/components/CommonTop/index.vue';
 import useCrud from '/@/hooks/useCrud';
 import ClassModal from './component/class/classModal.vue';
-import ImportFileModal from './component/class/importFileModal.vue';
+import ClassImportFileModal from './component/class/importFileModal.vue';
 import {  getAction, postAction } from '/@/api/common';
 import { PageEntity } from '/@/domain/page.entity';
 import { PaginationUtils } from '/@/utils/paginationUtils';
@@ -130,17 +134,18 @@ export default defineComponent({
 		DeptTree,
 		CommonTop,
 		ClassModal,
-		ImportFileModal
+		ClassImportFileModal
 	},
 	setup() {
 		const classRef = ref();
-		const ImportFileModalRef = ref();
+		const ClassImportFileModalRef = ref();
 		const MajorModalRef = ref();
 		const state = reactive({
 			uris: {
 				page: getClassPageApi,
 				deleteBatch: batchDeleteClassApi,
-				delete: deleteClassPageApi
+				delete: deleteClassPageApi,
+				exportUrl: exportClassDataApi
 			},
 			otherHeight: 156, // 20 + 20 + 36 + 15 + 50 + 15
 			pageInfo: new PageEntity(),
@@ -161,6 +166,7 @@ export default defineComponent({
 			clickReset,
 			clickBatchDelete,
 			clickDelete,
+			exportPage,
 			pageInfo,
 			dataList,
 			tableRef,
@@ -208,26 +214,7 @@ export default defineComponent({
 			})
 		};
 		const clickImport = () => {
-			ImportFileModalRef.value.openDialog();
-		};
-		const exportShow = (mode: number) => {
-			const obj = {
-				1: {
-					mode,
-					pager: {},
-					sourceIds: selectedRowKeys.value
-				},
-				3: {
-					mode,
-					pager: pageInfo.value,
-					sourceIds: []
-				}
-			}
-			if (mode === 1 && selectedRowKeys.value.length === 0) {
-				ElMessage.error('请选择至少一条数据');
-				return false;
-			}
-			postDownLoad(exportClassDataApi, obj[mode]);
+			ClassImportFileModalRef.value.openDialog();
 		};
 		onMounted(() => {
 			getSchoolAreaList();
@@ -238,9 +225,8 @@ export default defineComponent({
 		return {
 			clickNode,
 			clickImport,
-			exportShow,
 			classRef,
-			ImportFileModalRef,
+			ClassImportFileModalRef,
 			MajorModalRef,
 			...toRefs(state),
 
@@ -255,6 +241,7 @@ export default defineComponent({
 			clickBatchDelete,
 			clickDelete,
 			selectionChange,
+			exportPage,
 			pageInfo,
 			dataList,
 			searchParams,

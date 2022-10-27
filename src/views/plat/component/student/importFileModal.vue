@@ -3,20 +3,25 @@
 		<el-dialog :append-to-body='false'
 							 :close-on-click-modal='false'
 							 :title='state.title'
-							 v-model='state.isShowDialog' width='800px'>
+							 v-model='state.isShowDialog' width='1000px'>
 			<div class='row'>
 				1.下载导入模板 <span class='download' @click='downloadTemp'>点击下载</span>
 			</div>
 			<div class='row'>
 				2.按条件填写信息
 				<vxe-table :data='state.dataList'>
+					<vxe-column field='name' title='姓名' />
+					<vxe-column field='number' title='学号' />
 					<vxe-column field='schoolArea' title='校区' />
-					<vxe-column field='college' title='学院' />
+					<vxe-column field='dept' title='部门' />
 					<vxe-column field='major' title='专业' />
-					<vxe-column field='schoolYear' title='年级' />
-					<vxe-column field='className' title='班级名称' />
-					<vxe-column field='monitor' title='班长' />
-					<vxe-column field='tel' title='班长联系电话' />
+					<vxe-column field='className' title='班级' />
+					<vxe-column field='sex' title='性别' />
+					<vxe-column field='stuType' title='学生类型' />
+					<vxe-column field='schoolTime' title='入校时间' />
+					<vxe-column field='tel' title='电话' />
+					<vxe-column field='idCard' title='身份证号' />
+					<vxe-column field='email' title='邮箱' />
 				</vxe-table>
 			</div>
 			<div class='row down-btn'>
@@ -54,27 +59,31 @@
 
 <script lang='ts' setup>
 	import { reactive } from 'vue';
-	import { downloadClassTempApi, importClassTempApi } from '/@/api/plat/class';
-	import { baseUrl } from '/@/api/common';
+	import { downloadStuTempApi, importStuTempApi } from '/@/api/plat/student';
+	import { baseUrl, uploadAction } from '/@/api/common';
 	import { ElMessage } from 'element-plus';
-	import { uploadAction } from '/@/api/common';
 	import { StatusEnum } from '/@/enum/status.enum';
-
 
 	const emits = defineEmits([
 		'refreshList'
 	]);
+
 	const state = reactive({
 		isShowDialog: false,
-		title: '班级信息导入',
+		title: '学生信息导入',
 		dataList: [{
+			name: '必填',
+			number: '必填',
 			schoolArea: '必填',
-			college: '必填',
+			dept: '必填',
 			major: '必填',
-			schoolYear: '必填',
 			className: '必填',
-			monitor: '选填',
-			tel: '选填'
+			sex: '必填',
+			stuType: '必填',
+			schoolTime: '选填',
+			tel: '选填',
+			idCard: '选填',
+			email: '选填',
 		}],
 		fileName: '',
 		fileData: ''
@@ -88,7 +97,7 @@
 		state.fileName = '';
 	};
 	const downloadTemp = () => {
-		window.location.href = `${baseUrl}${downloadClassTempApi}`;
+		window.location.href = `${baseUrl}${downloadStuTempApi}`;
 	};
 	const handleChange = (file: any) => {
 		state.fileName = file.name;
@@ -96,7 +105,7 @@
 	};
 	const clickRemoveFile = () => {
 		state.fileName = '';
-	}
+	};
 	const clickConfirm = () => {
 		if (!state.fileData) {
 			ElMessage.error('请选择上传文件!');
@@ -104,17 +113,17 @@
 		}
 		const formData = new FormData();
 		formData.append('file', state.fileData);
-		uploadAction(importClassTempApi, formData).then(res => {
+		uploadAction(importStuTempApi, formData).then(res => {
 			if (res.status === StatusEnum.SUCCESS) {
 				ElMessage.success(res.message);
 				closeDialog();
 				emits('refreshList');
 			}
-		})
+		});
 	};
 	defineExpose({
 		openDialog
-	});
+	})
 </script>
 
 <style scoped lang='scss'>

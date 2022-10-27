@@ -16,6 +16,10 @@
 		</CommonTop>
 		<vxe-table
 			ref='tableRef'
+			:row-config='{
+				useKey: true,
+				keyField: "id"
+			}'
 			:data='dataList'
 			:max-height='tableHeight - otherHeight'
 			@checkbox-all='selectionChange'

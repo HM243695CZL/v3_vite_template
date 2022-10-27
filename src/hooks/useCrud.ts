@@ -2,6 +2,7 @@ import { onMounted, reactive, toRefs, computed, ref } from 'vue';
 import { PageEntity } from '/@/domain/page.entity';
 import { ElMessage } from 'element-plus';
 import { postAction } from '/@/api/common';
+import { postDownLoad } from '/@/utils/postdown';
 import { StatusEnum } from '/@/enum/status.enum';
 import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
@@ -11,7 +12,8 @@ interface CrudParams {
 	uris: {
 		page?: string, // 分页查询接口
 		deleteBatch?: string, // 批量删除接口
-		delete?: string // 单个删除接口
+		delete?: string, // 单个删除接口
+		exportUrl?: string, // 导出分页接口
 	},
 	parentRef?: any, // 父级ref
 	isMountedLoad?: boolean, // 是否挂载完成调用加载表格数据方法
@@ -183,6 +185,37 @@ export default function({
 		})
 	};
 	/**
+	 * 导出分页数据
+	 * @param mode 1 导出选中 3 导出全部
+	 */
+	const exportPage = (mode: number) => {
+		if (!uris.exportUrl) {
+			ElMessage.error('请设置uris.exportUrl属性!');
+			return false;
+		}
+		if (!mode) {
+			ElMessage.error('mode参数不能为空!');
+			return false;
+		}
+		const modeObj = {
+			1: {
+				mode,
+				pager: {},
+				sourceIds: state.selectedRowKeys
+			},
+			3: {
+				mode,
+				pager: state.pageInfo,
+				sourceIds: []
+			}
+		}
+		if (mode === 1 && state.selectedRowKeys.length === 0) {
+			ElMessage.error('请选择至少一条数据');
+			return false;
+		}
+		postDownLoad(uris.exportUrl, modeObj[mode]);
+	};
+	/**
 	 * 切换第几页
 	 * @param index 第几页
 	 */
@@ -222,6 +255,7 @@ export default function({
 		selectionChange,
 		clickDelete,
 		clickBatchDelete,
+		exportPage,
 		changePageIndex,
 		changePageSize,
 		tableRef,
