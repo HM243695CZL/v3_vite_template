@@ -18,6 +18,26 @@
 						</el-button>
 					</template>
 				</el-popconfirm>
+				<el-button size='default' type='default' @click='clickImport' v-if='props.buttonAuth.includes("importBtn")'>
+					<el-icon>
+						<ele-Download />
+					</el-icon>
+					导入
+				</el-button>
+				<el-dropdown v-if='props.buttonAuth.includes("exportBtn")'>
+					<el-button size='default' type='default' class='ml10'>
+						<el-icon>
+							<ele-Upload />
+						</el-icon>
+						导出
+					</el-button>
+					<template #dropdown>
+						<el-dropdown-menu>
+							<el-dropdown-item @click='exportPage(1)'>导出选中</el-dropdown-item>
+							<el-dropdown-item @click='exportPage(3)'>导出全部</el-dropdown-item>
+						</el-dropdown-menu>
+					</template>
+				</el-dropdown>
 				<slot name='left'></slot>
 			</div>
 			<div class='search-top-title-right'>
@@ -34,22 +54,35 @@
 </template>
 
 <script lang='ts' setup>
+const props = defineProps({
+	buttonAuth: {
+		type: Array,
+		default: () => []
+	}
+});
 
 const emits = defineEmits([
-	'clickSearch', 'clickReset', 'clickBatchDelete', 'clickAdd'
+	'clickSearch', 'clickReset', 'clickBatchDelete', 'clickAdd',
+	'clickImport', 'exportPage'
 ]);
 
 const clickSearch = () => {
 	emits('clickSearch');
 };
 const clickReset = () => {
-	emits('clickReset')
+	emits('clickReset');
 };
 const clickBatchDelete = () => {
 	emits('clickBatchDelete')
 };
 const clickAdd = () => {
-	emits('clickAdd')
+	emits('clickAdd');
+};
+const clickImport = () => {
+	emits('clickImport');
+};
+const exportPage = (mode: number) => {
+	emits('exportPage', mode);
 };
 </script>
 

@@ -17,29 +17,10 @@
 					@clickSearch='clickSearch'
 					@clickReset='clickReset'
 					@clickBatchDelete='clickBatchDelete'
+					@clickImport='clickImport'
+					@exportPage='exportPage'
+					:button-auth='["importBtn", "exportBtn"]'
 				>
-					<template #left>
-						<el-button size='default' type='default' @click='clickImport'>
-							<el-icon>
-								<ele-Download />
-							</el-icon>
-							导入
-						</el-button>
-						<el-dropdown>
-							<el-button size='default' type='default' class='ml10'>
-								<el-icon>
-									<ele-Upload />
-								</el-icon>
-								导出
-							</el-button>
-							<template #dropdown>
-								<el-dropdown-menu>
-									<el-dropdown-item @click='exportPage(1)'>导出选中</el-dropdown-item>
-									<el-dropdown-item @click='exportPage(3)'>导出全部</el-dropdown-item>
-								</el-dropdown-menu>
-							</template>
-						</el-dropdown>
-					</template>
 					<template #right>
 						<el-form-item label='班级名称'>
 							<el-input placeholder='请输入班级名称' v-model='searchParams.name'></el-input>
