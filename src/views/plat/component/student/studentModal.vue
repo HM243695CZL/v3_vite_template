@@ -4,7 +4,7 @@
 							 :close-on-click-modal='false'
 							 :title='state.title'
 							 v-model='state.isShowDialog' width='800px'>
-			<el-form ref='formRef' :rules='state.rules' :model='state.ruleForm' label-width='100px'>
+			<el-form ref='formRef' :rules='state.rules' :disabled='state.isView' :model='state.ruleForm' label-width='100px'>
 				<el-row :gutter='20'>
 					<el-col :span='12'>
 						<el-form-item label='姓名' prop='name'>
@@ -62,6 +62,7 @@
 						<div class='avatar-box'>
 							<img class='avatar-img' :src='state.avatarImg' alt=''>
 							<SingleUpload
+								v-if='!state.isView'
 								@uploadSuccess='handleSuccess'
 								accept-file='.png,.jpg,.jpeg,.bmg,.gif'
 								module-name='student'
@@ -87,7 +88,7 @@
 			<template #footer>
 				<div class='dialog-footer'>
 					<el-button @click='closeDialog'>取 消</el-button>
-					<el-button type='primary' @click='clickConfirm'>确 定</el-button>
+					<el-button type='primary' @click='clickConfirm' v-if='!state.isView'>确 定</el-button>
 				</div>
 			</template>
 		</el-dialog>
@@ -131,6 +132,7 @@
 	const state = reactive({
 		isShowDialog: false,
 		title: '',
+		isView: false,
 		avatarImg: userAvatar,
 		ruleForm: {
 			id: '',
@@ -182,7 +184,7 @@
 	const closeDialog = () => {
 		state.isShowDialog = false;
 	};
-	const openDialog = (row: any) => {
+	const openDialog = (row: any, isView?: boolean) => {
 		state.isShowDialog = true;
 		state.ruleForm.id = '';
 		state.avatarImg = userAvatar;
@@ -191,6 +193,7 @@
 			formRef.value.resetFields();
 			if (row) {
 				state.title = '修改学生';
+				state.isView = !!isView;
 				state.ruleForm = row;
 				state.ruleForm.sex = row.sex + '';
 				state.ruleForm.type = row.type && ~~row.type;
@@ -198,6 +201,7 @@
 				changeMajor(row.majorId);
 			} else {
 				state.title = '新增学生';
+				state.isView = false;
 			}
 		})
 	};

@@ -61,6 +61,12 @@ export default function({
 		modalFormRef.value.openDialog(_.cloneDeep(row));
 	};
 	/**
+	 * 点击查看
+	 */
+	const clickView = (row: any) => {
+		modalFormRef.value.openDialog(_.cloneDeep(row), true);
+	};
+	/**
 	 * 点击查询
 	 */
 	const clickSearch = () => {
@@ -207,6 +213,7 @@ export default function({
 	return {
 		clickAdd,
 		clickEdit,
+		clickView,
 		getDataList,
 		clickSearch,
 		clickReset,

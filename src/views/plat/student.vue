@@ -63,7 +63,7 @@
 			<vxe-column field='telphone' title='电话' />
 			<vxe-column title='操作' width='310'>
 				<template #default='scope'>
-					<el-button size='small' type='default'>查看</el-button>
+					<el-button size='small' type='default' @click='clickView(scope.row)'>查看</el-button>
 					<el-button size='small' type='primary' @click='clickResetPassword(scope.row.id)'>重置密码</el-button>
 					<el-button size='small' type='primary' @click='clickEdit(scope.row)'>编辑</el-button>
 					<el-button size='small' type='danger' @click='clickDelete(scope.row.id)'>删除</el-button>
@@ -144,6 +144,7 @@ export default defineComponent({
 		const {
 			clickAdd,
 			clickEdit,
+			clickView,
 			getDataList,
 			changePageIndex,
 			changePageSize,
@@ -251,6 +252,7 @@ export default defineComponent({
 
 			clickAdd,
 			clickEdit,
+			clickView,
 			getDataList,
 			changePageIndex,
 			changePageSize,
