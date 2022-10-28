@@ -38,6 +38,11 @@ import { reactive, ref } from 'vue';
 	const openDialog = (row: any) => {
 		state.isShowDialog = true;
 		state.ruleForm.id = '';
+		if (row) {
+			state.title = '修改菜单';
+		} else {
+			state.title = '新增菜单';
+		}
 	};
 	const clickConfirm = () => {
 
