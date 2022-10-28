@@ -92,7 +92,7 @@
 		 />
 		<StudentModal
 			ref='modalFormRef'
-			@refreshList='clickReset'
+			@refreshList='getDataList'
 			:school-area-list='schoolAreaList'
 			:dept-list='deptList'
 			:sex-list='sexObj'

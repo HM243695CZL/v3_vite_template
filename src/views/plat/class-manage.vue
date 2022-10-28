@@ -66,7 +66,7 @@
 					:total="pageInfo.totalRecords"
 				 />
 				<ClassModal ref='modalFormRef'
-										@refreshList='clickReset'
+										@refreshList='getDataList'
 										:school-area-list='schoolAreaList'
 										:dept-list='deptList'
 										:teacher-list='teacherList'

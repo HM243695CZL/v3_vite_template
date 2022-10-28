@@ -30,6 +30,10 @@
 				<el-button size='small' type='danger'>删除</el-button>
 			</vxe-column>
 		</vxe-table>
+		<MenuModal
+			ref='modalFormRef'
+			@refreshList='getDataList'
+		/>
 	</div>
 </template>
 
@@ -39,14 +43,17 @@ import { getMenuPageApi } from '/@/api/plat/menu';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
+import MenuModal from './component/menu/menuModal.vue';
 
 export default defineComponent({
 	name: 'sys-menu',
 	components: {
-		CommonTop
+		CommonTop,
+		MenuModal
 	},
 	setup() {
 		const sysMenuRef = ref();
+		const modalFormRef = ref();
 		const state = reactive({
 			dataList: [],
 			statusObj: {
@@ -62,7 +69,7 @@ export default defineComponent({
 			})
 		};
 		const clickAdd = () => {
-
+			modalFormRef.value.openDialog();
 		};
 		onMounted(() => {
 			getDataList();
@@ -71,6 +78,7 @@ export default defineComponent({
 			getDataList,
 			clickAdd,
 			sysMenuRef,
+			modalFormRef,
 			...toRefs(state),
 		}
 	}
