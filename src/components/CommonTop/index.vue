@@ -2,13 +2,13 @@
 	<div class='common-top-container mb15'>
 		<div class='search-top-title'>
 			<div class='search-top-title-left'>
-				<el-button size="default" type="primary" @click='clickAdd'>
+				<el-button size="default" type="primary" @click='clickAdd' v-if='props.buttonAuth.includes("addBtn")'>
 					<el-icon>
 						<ele-Plus />
 					</el-icon>
 					新增
 				</el-button>
-				<el-popconfirm title="确定删除所选数据吗？" @confirm='clickBatchDelete'>
+				<el-popconfirm title="确定删除所选数据吗？" @confirm='clickBatchDelete' v-if='props.buttonAuth.includes("deleteBtn")'>
 					<template #reference>
 						<el-button size="default" type="default" class="ml10">
 							<el-icon>
@@ -42,10 +42,10 @@
 			</div>
 			<div class='search-top-title-right'>
 				<slot name='right'></slot>
-				<el-button size="default" type="primary" class="ml10" @click='clickSearch()'>
+				<el-button size="default" type="primary" class="ml10" @click='clickSearch()' v-if='props.buttonAuth.includes("searchBtn")'>
 					查询
 				</el-button>
-				<el-button size="default" type="default" class="ml10" @click='clickReset()'>
+				<el-button size="default" type="default" class="ml10" @click='clickReset()' v-if='props.buttonAuth.includes("resetBtn")'>
 					重置
 				</el-button>
 			</div>
@@ -57,7 +57,9 @@
 const props = defineProps({
 	buttonAuth: {
 		type: Array,
-		default: () => []
+		default: () => [
+			'addBtn', 'deleteBtn', 'searchBtn', 'resetBtn'
+		]
 	}
 });
 

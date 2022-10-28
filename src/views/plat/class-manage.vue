@@ -19,7 +19,7 @@
 					@clickBatchDelete='clickBatchDelete'
 					@clickImport='clickImport'
 					@exportPage='exportPage'
-					:button-auth='["importBtn", "exportBtn"]'
+					:button-auth='["addBtn", "deleteBtn", "searchBtn", "resetBtn", "importBtn", "exportBtn"]'
 				>
 					<template #right>
 						<el-form-item label='班级名称'>
