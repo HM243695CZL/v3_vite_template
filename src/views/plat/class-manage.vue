@@ -64,8 +64,7 @@
 					v-model:page-size="pageInfo.rows"
 					layout="total, sizes, prev, pager, next, jumper"
 					:total="pageInfo.totalRecords"
-				>
-				</el-pagination>
+				 />
 				<ClassModal ref='modalFormRef'
 										@refreshList='clickReset'
 										:school-area-list='schoolAreaList'

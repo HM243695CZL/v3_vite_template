@@ -71,8 +71,7 @@
 			v-model:page-size="pageInfo.rows"
 			layout="total, sizes, prev, pager, next, jumper"
 			:total="pageInfo.totalRecords"
-		>
-		</el-pagination>
+		 />
 		<TeacherModal ref='modalFormRef'
 									@refreshList='clickReset'
 									:dept-list='deptList'
