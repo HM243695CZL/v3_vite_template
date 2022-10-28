@@ -56,6 +56,8 @@ export function backEndComponent(routes: any) {
 export function transformMenuToRoutes(menu: any) {
 	const menuArr = [] as any;
 	menu.map((item: any) => {
+		// 排除因为组件名称导致警告问题
+		item.url = item.url.replace('/menu', '/sys-menu');
 		const obj = {
 			path: item.url,
 			name: item.url.split('/')[item.url.split('/').length - 1],
