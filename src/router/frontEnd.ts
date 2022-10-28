@@ -58,7 +58,7 @@ export function transformMenuToRoutes(menu: any) {
 	menu.map((item: any) => {
 		const obj = {
 			path: item.url,
-			name: '',
+			name: item.url.split('/')[item.url.split('/').length - 1],
 			component: item.url,
 			children: [],
 			meta: {
