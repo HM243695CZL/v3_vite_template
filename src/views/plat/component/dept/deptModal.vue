@@ -6,14 +6,15 @@
 							 v-model='state.isShowDialog' width='800px'>
 			<el-form ref='formRef' :rules='state.rules' :model='state.ruleForm' label-width='100px'>
 				<el-form-item label='上级部门' prop='parentId'>
-					<el-select placeholder='默认顶级部门' class='w100' disabled v-if='!state.ruleForm.parentId || state.ruleForm.parentId === "0"' v-model='state.ruleForm.parentId'>
-						<el-option label='默认顶级部门' value='0'></el-option>
-					</el-select>
 					<el-tree-select v-model='state.ruleForm.parentId'
-													v-else
-													:data='props.deptList'
+													:data='[{
+														key: "0",
+														title: "顶级部门",
+														children: props.deptList
+													}]'
 													:check-strictly='true'
 													placeholder='请选择部门'
+													ref='deptTreeRef'
 													filterable
 													class='w100'
 													disabled
@@ -73,6 +74,7 @@ const props = defineProps({
 		'refreshList'
 	]);
 	const formRef = ref();
+	const deptTreeRef = ref();
 	const state = reactive({
 		isShowDialog: false,
 		title: '',
@@ -104,6 +106,7 @@ const props = defineProps({
 				if (!isSub) {
 					state.ruleForm.id = row.key;
 					state.ruleForm.parentId = row.parentId ? row.parentId : '0';
+					deptTreeRef.value.setCurrentKey(state.ruleForm.parentId);
 					state.ruleForm.name = row.title;
 					if (row.leaderId !== 'undefined' && row.leaderId !== null && row.leaderId !== '') {
 						state.ruleForm.leaderId = row.leaderId.split(',');
@@ -113,6 +116,7 @@ const props = defineProps({
 					}
 				} else {
 					state.ruleForm.parentId = row.key;
+					deptTreeRef.value.setCurrentKey(row.key);
 				}
 			} else {
 				state.title = '新增部门';
