@@ -90,6 +90,7 @@
 	import userAvatar from '/@/assets/user/photo0.png';
 	import { ElMessage } from 'element-plus';
 	import SingleUpload from '/@/components/Upload/SingleUpload.vue';
+	import { OtherUtil } from '/@/utils/other.util';
 	const props = defineProps({
 		deptList: {
 			type: Array,
@@ -175,7 +176,7 @@
 			formRef.value.resetFields();
 			if (row) {
 				state.title = '修改教师';
-				state.ruleForm = row;
+				state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
 				state.ruleForm.type = row.type + '';
 				state.ruleForm.sex = row.sex + '';
 				if (row.photo) {

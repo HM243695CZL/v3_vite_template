@@ -70,6 +70,7 @@ import {
 import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import { ElMessage } from 'element-plus';
+import { OtherUtil } from '/@/utils/other.util';
 
 const props = defineProps({
 		schoolAreaList: {
@@ -143,7 +144,7 @@ const props = defineProps({
 			formRef.value.resetFields();
 			if (row) {
 				state.title = '修改班级';
-				state.ruleForm = row;
+				state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
 				changeCollege(row.collageId);
 			} else {
 				state.title = '新增班级';

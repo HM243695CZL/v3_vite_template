@@ -37,6 +37,7 @@ import { createDictApi, updateDictApi } from '/@/api/plat/dictionary';
 import { postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import { ElMessage } from 'element-plus';
+import { OtherUtil } from '/@/utils/other.util';
 
 const emits = defineEmits([
 		'refreshList'
@@ -81,7 +82,7 @@ const emits = defineEmits([
 				if (isKey) {
 					state.ruleForm.type = row.type;
 				} else {
-					state.ruleForm = row;
+					state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
 				}
 			} else {
 				state.title = '新增字典';

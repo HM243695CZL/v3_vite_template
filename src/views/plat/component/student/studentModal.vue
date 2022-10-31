@@ -106,6 +106,7 @@
 	import { ElMessage } from 'element-plus';
 	import SingleUpload from '/@/components/Upload/SingleUpload.vue';
 	import { verifyElFormIdCard } from '/@/utils/toolsValidate';
+	import { OtherUtil } from '/@/utils/other.util';
 
 	const props = defineProps({
 		schoolAreaList: {
@@ -194,7 +195,7 @@
 			if (row) {
 				state.title = '修改学生';
 				state.isView = !!isView;
-				state.ruleForm = row;
+				state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
 				state.ruleForm.sex = row.sex + '';
 				state.ruleForm.type = row.type && ~~row.type;
 				changeCollege(row.collegeId);
