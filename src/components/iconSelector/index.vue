@@ -1,6 +1,6 @@
 <template>
 	<div class="icon-selector">
-		<el-popover placement="bottom" :width="fontIconWidth" v-model:visible="fontIconVisible" popper-class="icon-selector-popper">
+		<el-popover placement="top" :width="fontIconWidth" v-model:visible="fontIconVisible" popper-class="icon-selector-popper">
 			<template #reference>
 				<el-input
 					v-model="fontIconSearch"

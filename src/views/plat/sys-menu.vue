@@ -23,25 +23,27 @@
 					{{statusObj[scope.row.status]}}
 				</template>
 			</vxe-column>
-			<vxe-column title='操作' width='310'>
-				<el-button size='small' type='default'>查看</el-button>
-				<el-button size='small' type='primary'>编辑</el-button>
-				<el-button size='small' type='primary'>添加子菜单</el-button>
-				<el-button size='small' type='danger'>删除</el-button>
+			<vxe-column title='操作' width='240'>
+				<template #default='scope'>
+					<el-button size='small' type='primary' @click='clickEdit(scope.row.key)'>编辑</el-button>
+					<el-button size='small' type='primary'>添加子菜单</el-button>
+					<el-button size='small' type='danger'>删除</el-button>
+				</template>
 			</vxe-column>
 		</vxe-table>
 		<MenuModal
 			ref='modalFormRef'
 			@refreshList='getDataList'
+			:menu-tree-list='menuTreeList'
 		/>
 	</div>
 </template>
 
 <script lang='ts'>
 import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue';
-import { getMenuPageApi } from '/@/api/plat/menu';
+import { getMenuListTreeApi, getMenuPageApi, getMenuInfoApi } from '/@/api/plat/menu';
 import CommonTop from '/@/components/CommonTop/index.vue';
-import { postAction } from '/@/api/common';
+import { getAction, postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import MenuModal from './component/menu/menuModal.vue';
 
@@ -59,7 +61,8 @@ export default defineComponent({
 			statusObj: {
 				1: '显示',
 				0: '隐藏'
-			}
+			},
+			menuTreeList: [] as any
 		});
 		const getDataList = () => {
 			postAction(getMenuPageApi, {}).then(res => {
@@ -68,15 +71,35 @@ export default defineComponent({
 				}
 			})
 		};
+		const getMenuListTree = () => {
+			getAction(getMenuListTreeApi, '').then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					state.menuTreeList = [{
+						title: '根节点',
+						key: '980989898999',
+						children: res.datas
+					}]
+				}
+			});
+		};
 		const clickAdd = () => {
 			modalFormRef.value.openDialog();
 		};
+		const clickEdit = (id: string) => {
+			postAction(getMenuInfoApi, {id}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					modalFormRef.value.openDialog(res.datas);
+				}
+			});
+		};
 		onMounted(() => {
 			getDataList();
+			getMenuListTree();
 		});
 		return {
 			getDataList,
 			clickAdd,
+			clickEdit,
 			sysMenuRef,
 			modalFormRef,
 			...toRefs(state),

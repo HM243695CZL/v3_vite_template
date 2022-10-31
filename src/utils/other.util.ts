@@ -1,4 +1,5 @@
 // import {isUndefined} from 'util';
+import _ from 'lodash';
 
 /**
  *  其他常用工具类
@@ -302,5 +303,18 @@ export class OtherUtil {
    */
   public static classPeriod() {
     return ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
+  }
+
+    /**
+     * 对象赋值
+     * @param target 目标对象
+     * @param source 源对象
+     */
+  public static cloneForm(target: Object, source: Object): Object {
+      const result = _.cloneDeep(target);
+      Object.keys(result).map(item => {
+          result[item] = source[item];
+      });
+      return result;
   }
 }

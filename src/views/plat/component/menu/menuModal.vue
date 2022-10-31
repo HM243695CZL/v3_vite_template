@@ -5,7 +5,49 @@
 							 :title='state.title'
 							 v-model='state.isShowDialog' width='800px'>
 			<el-form ref='formRef' :rules='state.rules' :model='state.ruleForm' label-width='100px'>
-
+				<el-form-item label='上级菜单' prop='parentId'>
+					<el-tree-select v-model='state.ruleForm.parentId'
+													:data='props.menuTreeList'
+													:check-strictly='true'
+													placeholder='请选择上级菜单'
+													filterable
+													class='w100'
+													:props='{
+																label: "title",
+																value: "key"
+															}' />
+				</el-form-item>
+				<el-form-item label='菜单名称' prop='name'>
+					<el-input placeholder='请输入菜单名称' v-model='state.ruleForm.name'></el-input>
+				</el-form-item>
+				<el-form-item label='类型' prop='type'>
+					<el-select class='w100' clearable placeholder='请选择类型' v-model='state.ruleForm.type'>
+						<el-option v-for='item of state.typeList' :key='item.value' :label='item.text' :value='item.value'></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item label='可见性' prop='status'>
+					<el-radio-group v-model="state.ruleForm.status">
+						<el-radio :label="1" size="large">显示</el-radio>
+						<el-radio :label="0" size="large">隐藏</el-radio>
+					</el-radio-group>
+				</el-form-item>
+				<el-form-item label='链接' prop='url'>
+					<el-input v-model='state.ruleForm.url' placeholder='请输入链接'></el-input>
+				</el-form-item>
+				<el-form-item label='目标' prop='targetType'>
+					<el-select v-model='state.ruleForm.targetType' placeholder='请选择目标' class='w100'>
+						<el-option v-for='item of state.targetList' :key='item.value' :label='item.text' :value='item.value'></el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item label='排序' prop='showLevel'>
+					<el-input-number :min='1' v-model='state.ruleForm.showLevel' placeholder='升序、值越小、排序越高' class='w100'></el-input-number>
+				</el-form-item>
+				<el-form-item label='图标' prop='icon'>
+					<el-input placeholder='请输入图标' v-model='state.ruleForm.icon'></el-input>
+				</el-form-item>
+				<el-form-item label='备注' prop='remark'>
+					<el-input placeholder='请输入备注' v-model='state.ruleForm.remark'></el-input>
+				</el-form-item>
 			</el-form>
 			<template #footer>
 				<div class='dialog-footer'>
@@ -18,7 +60,19 @@
 </template>
 
 <script lang='ts' setup>
-import { reactive, ref } from 'vue';
+import { nextTick, reactive, ref } from 'vue';
+import { postAction } from '/@/api/common';
+import { StatusEnum } from '/@/enum/status.enum';
+import { createMenuApi, updateMenuApi } from '/@/api/plat/menu';
+import { ElMessage } from 'element-plus';
+import { OtherUtil } from '/@/utils/other.util';
+
+const props = defineProps({
+		menuTreeList: {
+			type: Array,
+			required: true
+		}
+	});
 
 	const emits = defineEmits([
 		'refreshList'
@@ -28,9 +82,44 @@ import { reactive, ref } from 'vue';
 		isShowDialog: false,
 		title: '',
 		ruleForm:{
-			id: ''
+			id: '',
+			parentId: '',
+			name: '',
+			type: null,
+			status: '',
+			url: '',
+			targetType: '',
+			showLevel: undefined,
+			icon: '',
+			remark: ''
 		},
-		rules: {}
+		rules: {
+			parentId: [
+				{ required: true, message: '上级菜单不能为空', trigger: 'change' }
+			],
+			name: [
+				{ required: true, message: '菜单名称不能为空', trigger: 'blur' }
+			],
+			type: [
+				{ required: true, message: '类型不能为空', trigger: 'change' }
+			],
+			url: [
+				{ required: true, message: '链接不能为空', trigger: 'blur' }
+			],
+			showLevel: [
+				{ required: true, message: '排序不能为空', trigger: 'blur' }
+			]
+		},
+		typeList: [
+			{ text: '菜单', value: 0 },
+			{ text: '按钮', value: 1 },
+			{ text: '其他', value: 2 },
+		],
+		targetList: [
+			{ text: '内部系统', value: 0 },
+			{ text: '新窗口打开', value: 1 },
+			{ text: '第三方链接', value: 2 },
+		]
 	});
 	const closeDialog = () => {
 		state.isShowDialog = false;
@@ -38,14 +127,28 @@ import { reactive, ref } from 'vue';
 	const openDialog = (row: any) => {
 		state.isShowDialog = true;
 		state.ruleForm.id = '';
-		if (row) {
-			state.title = '修改菜单';
-		} else {
-			state.title = '新增菜单';
-		}
+		nextTick(() => {
+			formRef.value.resetFields();
+			if (row) {
+				state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
+				state.title = '修改菜单';
+			} else {
+				state.title = '新增菜单';
+			}
+		})
 	};
 	const clickConfirm = () => {
-
+		formRef.value.validate((valid: boolean) => {
+			if (valid) {
+				postAction(state.ruleForm.id ? updateMenuApi : createMenuApi, state.ruleForm).then(res => {
+					if (res.status === StatusEnum.SUCCESS) {
+						ElMessage.success(res.message);
+						closeDialog();
+						emits('refreshList');
+					}
+				})
+			}
+		})
 	};
 	defineExpose({
 		openDialog
