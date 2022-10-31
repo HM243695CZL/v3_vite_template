@@ -26,8 +26,8 @@
 			<vxe-column title='操作' width='240'>
 				<template #default='scope'>
 					<el-button size='small' type='primary' @click='clickEdit(scope.row.key)'>编辑</el-button>
-					<el-button size='small' type='primary'>添加子菜单</el-button>
-					<el-button size='small' type='danger'>删除</el-button>
+					<el-button size='small' type='primary' @click='clickAddSub(scope.row.key)'>添加子菜单</el-button>
+					<el-button size='small' type='danger' @click='clickDelete(scope.row.key)'>删除</el-button>
 				</template>
 			</vxe-column>
 		</vxe-table>
@@ -35,17 +35,19 @@
 			ref='modalFormRef'
 			@refreshList='getDataList'
 			:menu-tree-list='menuTreeList'
+			:root-tree-id='rootTreeId'
 		/>
 	</div>
 </template>
 
 <script lang='ts'>
 import { defineComponent, onMounted, reactive, ref, toRefs } from 'vue';
-import { getMenuListTreeApi, getMenuPageApi, getMenuInfoApi } from '/@/api/plat/menu';
+import { getMenuListTreeApi, getMenuPageApi, getMenuInfoApi, deleteMenuApi } from '/@/api/plat/menu';
 import CommonTop from '/@/components/CommonTop/index.vue';
 import { getAction, postAction } from '/@/api/common';
 import { StatusEnum } from '/@/enum/status.enum';
 import MenuModal from './component/menu/menuModal.vue';
+import { ElMessage } from 'element-plus';
 
 export default defineComponent({
 	name: 'sys-menu',
@@ -62,7 +64,8 @@ export default defineComponent({
 				1: '显示',
 				0: '隐藏'
 			},
-			menuTreeList: [] as any
+			menuTreeList: [] as any,
+			rootTreeId: '980989898999'
 		});
 		const getDataList = () => {
 			postAction(getMenuPageApi, {}).then(res => {
@@ -76,7 +79,7 @@ export default defineComponent({
 				if (res.status === StatusEnum.SUCCESS) {
 					state.menuTreeList = [{
 						title: '根节点',
-						key: '980989898999',
+						key: state.rootTreeId,
 						children: res.datas
 					}]
 				}
@@ -92,6 +95,21 @@ export default defineComponent({
 				}
 			});
 		};
+		const clickAddSub = (id: string) => {
+			postAction(getMenuInfoApi, {id}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					modalFormRef.value.openDialog(res.datas, true);
+				}
+			});
+		};
+		const clickDelete = (id: string) => {
+			postAction(deleteMenuApi, {id}).then(res => {
+				if (res.status === StatusEnum.SUCCESS) {
+					ElMessage.success(res.message);
+					getDataList();
+				}
+			});
+		};
 		onMounted(() => {
 			getDataList();
 			getMenuListTree();
@@ -100,6 +118,8 @@ export default defineComponent({
 			getDataList,
 			clickAdd,
 			clickEdit,
+			clickAddSub,
+			clickDelete,
 			sysMenuRef,
 			modalFormRef,
 			...toRefs(state),

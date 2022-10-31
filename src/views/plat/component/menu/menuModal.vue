@@ -9,9 +9,11 @@
 					<el-tree-select v-model='state.ruleForm.parentId'
 													:data='props.menuTreeList'
 													:check-strictly='true'
+													node-key='key'
 													placeholder='请选择上级菜单'
 													filterable
 													class='w100'
+													ref='menuTreeRef'
 													:props='{
 																label: "title",
 																value: "key"
@@ -71,6 +73,10 @@ const props = defineProps({
 		menuTreeList: {
 			type: Array,
 			required: true
+		},
+		rootTreeId: {
+			type: String,
+			required: true
 		}
 	});
 
@@ -78,6 +84,7 @@ const props = defineProps({
 		'refreshList'
 	]);
 	const formRef = ref();
+	const menuTreeRef = ref();
 	const state = reactive({
 		isShowDialog: false,
 		title: '',
@@ -124,14 +131,20 @@ const props = defineProps({
 	const closeDialog = () => {
 		state.isShowDialog = false;
 	};
-	const openDialog = (row: any) => {
+	const openDialog = (row: any, isSub: boolean) => {
 		state.isShowDialog = true;
 		state.ruleForm.id = '';
 		nextTick(() => {
 			formRef.value.resetFields();
 			if (row) {
-				state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
-				state.title = '修改菜单';
+				isSub ? state.title = '新增菜单' : '修改菜单';
+				if (!isSub) {
+					state.ruleForm = OtherUtil.cloneForm(state.ruleForm, row) as any;
+					menuTreeRef.value.setCurrentKey(row.parentId);
+				} else {
+					state.ruleForm.parentId = row.id;
+					menuTreeRef.value.setCurrentKey(row.id);
+				}
 			} else {
 				state.title = '新增菜单';
 			}
