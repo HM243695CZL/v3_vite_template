@@ -8,7 +8,14 @@ import { PaginationUtils } from '/@/utils/paginationUtils';
 import { FilterEnum, FilterTypeEnum } from '/@/enum/filter.enum';
 import _ from 'lodash';
 
-interface CrudParams {
+interface IOtherQueryType {
+	field: string;
+	matchMode: string;
+	value: any;
+	whereType?: string;
+}
+
+interface ICrudParams {
 	uris: {
 		page?: string, // 分页查询接口
 		deleteBatch?: string, // 批量删除接口
@@ -17,11 +24,11 @@ interface CrudParams {
 	},
 	parentRef?: any, // 父级ref
 	isMountedLoad?: boolean, // 是否挂载完成调用加载表格数据方法
-	initField?: string[] // 不需要重置数据的字段名
+	initField?: string[], // 不需要重置数据的字段名
 }
 export default function({
 		uris, parentRef, isMountedLoad = true, initField = []
-	}: CrudParams) {
+	}: ICrudParams) {
 	const tableRef = ref();
 	const modalFormRef = ref();
 	const state = reactive({
@@ -30,7 +37,7 @@ export default function({
 		searchParams: {} as any,
 		selectedRowKeys: [] as any, // 被选中的数据主键
 		selectionRows: [], // 被选中的数据行
-		tableHeight: 300
+		tableHeight: 300,
 	});
 	/**
 	 * 加载表格数据
