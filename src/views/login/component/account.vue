@@ -56,6 +56,7 @@ import { OtherUtil } from '/@/utils/other.util';
 import { SERVER_NAME } from '/@/utils/config';
 import {StatusEnum} from '/@/enum/status.enum';
 import { loginApi } from '/@/api/login';
+import { postAction } from '/@/api/common';
 
 export default defineComponent({
 	name: 'loginAccount',
@@ -126,7 +127,7 @@ export default defineComponent({
 				roles: defaultRoles,
 				authBtnList: defaultAuthBtnList,
 			};
-			loginApi({
+			postAction(loginApi, {
 				username: state.ruleForm.username,
 				password: Md5.hashStr(state.ruleForm.password),
 				queryParam: state.ruleForm.queryParam,
