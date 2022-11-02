@@ -40,11 +40,18 @@ const layoutPath = [
 	'/pages/statistical-analysis',
 	'/pages/plat/'
 ];
+const allPathArr = [] as any;
+Object.keys(modules).map((item: string) => {
+	allPathArr.push(item.replace(/..\/views|../, '').replace('.vue', ''));
+});
+
 export function backEndComponent(routes: any) {
 	if (!routes) return;
 	return routes.map((item: any) => {
 		if (layoutPath.includes(item.component)) {
 			item.component = () => import('/@/layout/routerView/parent.vue');
+		} else if(!allPathArr.includes(item.component.replace('/pages', ''))){
+			item.component = () => import('/@/views/error/404.vue');
 		} else {
 			item.component = dynamicImport(modules, item.component);
 		}

@@ -16,7 +16,7 @@
 				</el-form-item>
 				<el-form-item label='日期'>
 					<el-date-picker
-						v-model="date"
+						v-model="searchParams.date"
 						type="date"
 						placeholder="请选择日期"
 						format='YYYY-MM-DD'
@@ -115,6 +115,17 @@ export default defineComponent({
 		} = useCrud({
 			uris: state.uris,
 			parentRef: logsRef,
+		});
+		onMounted(() => {
+			state.otherQueryType = [
+				{
+					field: 'gmtCreate',
+					matchMode: FilterEnum.BETWEEN,
+					value: 'aaaaaaaaaa',
+					whereType: FilterTypeEnum.AND
+				}
+			];
+			clickSearch();
 		});
 		return {
 			logsRef,
