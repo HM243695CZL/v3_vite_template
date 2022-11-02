@@ -42,16 +42,21 @@
  - `vxe-table` 插件统一配置【`main.ts`】
    - 支持列拖拽
    - 数据单行显示
+   - 固定表头
 
 ## 注：上述开发规范可参考`/@/views/plat/teacher.vue`
 
 
 
 ### 开发说明
+ - 开发时尽量保证浏览器的`console`无警告信息
+ - 组件传参`props`需声明参数类型
  - `/@`代表`src`目录
  - `el-tree` `el-tree-select`回显问题
    - 通过`setCurrentKey`进行回显 
    - `menuTreeRef.value.setCurrentKey(id)`
+ - `v-for`必须设置`key`属性
+ - `v-for`与`v-if`不能在同一个元素同时使用
 
 ### 相关文档地址
 - [vxe-table](https://vxetable.cn/#/table/start/install)
