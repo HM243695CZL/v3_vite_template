@@ -1,7 +1,7 @@
 <template>
 	<div class='logs-container h100' ref='logsRef'>
 		<CommonTop
-			@clickSearch='clickSearch'
+			@clickSearch='clickCurrSearch'
 			@clickReset='clickReset'
 			:button-auth='["exportBtn", "searchBtn", "resetBtn"]'
 		>
@@ -16,7 +16,7 @@
 				</el-form-item>
 				<el-form-item label='日期'>
 					<el-date-picker
-						v-model="searchParams.date"
+						v-model="date"
 						type="date"
 						placeholder="请选择日期"
 						format='YYYY-MM-DD'
@@ -100,6 +100,17 @@ export default defineComponent({
 		const formatTime = ({ cellValue }) => {
 			return XEUtils.toDateString(cellValue, 'yyyy-MM-dd HH:mm:ss');
 		};
+		const clickCurrSearch = () => {
+			state.otherQueryType = [
+				{
+					field: 'gmtCreate',
+					matchMode: FilterEnum.BETWEEN,
+					value: dayjs(state.date).format('YYYY-MM-DD') + ' 00:00:00,' + dayjs(state.date).format('YYYY-MM-DD') + ' 23:59:59',
+					whereType: FilterTypeEnum.AND
+				}
+			];
+			clickSearch(state.otherQueryType);
+		};
 		const {
 			getDataList,
 			changePageIndex,
@@ -115,28 +126,22 @@ export default defineComponent({
 		} = useCrud({
 			uris: state.uris,
 			parentRef: logsRef,
+			isMountedLoad: false
 		});
 		onMounted(() => {
-			state.otherQueryType = [
-				{
-					field: 'gmtCreate',
-					matchMode: FilterEnum.BETWEEN,
-					value: 'aaaaaaaaaa',
-					whereType: FilterTypeEnum.AND
-				}
-			];
-			clickSearch();
+			state.date = dayjs(new Date()).format('YYYY-MM-DD');
+			clickCurrSearch();
 		});
 		return {
 			logsRef,
 			formatTime,
+			clickCurrSearch,
 			...toRefs(state),
 
 			getDataList,
 			changePageIndex,
 			changePageSize,
 			clickReset,
-			clickSearch,
 			pageInfo,
 			dataList,
 			tableRef,

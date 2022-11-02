@@ -78,7 +78,7 @@ export default function({
 	/**
 	 * 点击查询
 	 */
-	const clickSearch = () => {
+	const clickSearch = (otherQueryTypeArr?: Array<IOtherQueryType>) => {
 		if (JSON.stringify(state.searchParams) === '{}') {
 			state.pageInfo.filters = {};
 		}
@@ -94,6 +94,12 @@ export default function({
 			if (Array.isArray(state.searchParams[o])) {
 				PaginationUtils.dealPageChange(state.pageInfo, o, state.searchParams[o].join(','), FilterEnum.IN, FilterTypeEnum.AND);
 			}
+		}
+		if (otherQueryTypeArr) {
+			otherQueryTypeArr.map((item: IOtherQueryType) => {
+				const { matchMode, value, field, whereType } = item;
+				state.pageInfo.filters[field] = { matchMode, value, whereType };
+			})
 		}
 		state.pageInfo.first = 1;
 		getDataList();
