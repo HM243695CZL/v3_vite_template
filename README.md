@@ -12,6 +12,7 @@
    - 开发环境请求地址：`/.env.development`
    - 生产环境请求地址：`.env.production`
  - API接口
+   - 接口请求地址请在`/@/api/`目录下定义
    - `/@/api/common` 公共接口
      - `baseUrl` 基础路径
      - `uploadUrl` 上传接口
